@@ -123,7 +123,7 @@ export function FeedbackModal({ open, onClose }: FeedbackModalProps) {
                     <button
                       onClick={handleSubmit}
                       disabled={!message.trim() || submitting}
-                      className="flex-1 rounded-lg border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white shadow-[3px_3px_0px_#2563eb] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#2563eb] disabled:opacity-50"
+                      className="flex-1 rounded-lg border-2 border-black bg-secondary px-4 py-2 text-sm font-bold text-white shadow-[3px_3px_0px_var(--color-secondary-light)] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_var(--color-secondary-light)] disabled:opacity-50"
                     >
                       {submitting ? "Sending..." : "Submit"}
                     </button>

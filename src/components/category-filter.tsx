@@ -29,7 +29,7 @@ export function CategoryFilter({
           className={cn(
             "rounded-xl border-3 border-black px-3 py-1.5 text-xs font-bold transition-colors sm:px-6 sm:py-2.5 sm:text-sm",
             selected === cat._id
-              ? "bg-blue-500 text-white shadow-[3px_3px_0px_#000]"
+              ? "bg-selected text-white shadow-[3px_3px_0px_#000]"
               : "bg-white text-black shadow-[3px_3px_0px_#000]",
           )}
         >
@@ -46,7 +46,7 @@ export function CategoryFilter({
         className={cn(
           "rounded-xl border-3 border-black px-3 py-1.5 text-xs font-bold transition-colors sm:px-6 sm:py-2.5 sm:text-sm",
           !selected
-            ? "bg-blue-500 text-white shadow-[3px_3px_0px_#000]"
+            ? "bg-selected text-white shadow-[3px_3px_0px_#000]"
             : "bg-white text-black shadow-[3px_3px_0px_#000]",
         )}
       >

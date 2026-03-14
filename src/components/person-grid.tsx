@@ -81,7 +81,7 @@ export function PersonGrid() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="neo-brutal mx-auto w-full max-w-5xl bg-amber-50 px-4 py-5 sm:px-8 sm:py-8 md:px-12"
+        className="neo-brutal mx-auto w-full max-w-5xl bg-surface-alt px-4 py-5 sm:px-8 sm:py-8 md:px-12"
       >
         <SearchBar value={search} onChange={setSearch} />
         <CategoryFilter
@@ -89,6 +89,25 @@ export function PersonGrid() {
           selected={selectedCategory}
           onSelect={setSelectedCategory}
         />
+      </motion.div>
+
+      {/* Smash that button CTA */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+        className="flex justify-center"
+      >
+        <div className="rounded-full border-3 border-black bg-white px-4 py-1.5 text-xs font-black uppercase shadow-[3px_3px_0px_#000] sm:px-6 sm:py-2 sm:text-base sm:shadow-[4px_4px_0px_#000]">
+          <motion.span
+            animate={{ rotate: [0, 15, -15, 15, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 2 }}
+            className="mr-1 inline-block"
+          >
+            👇
+          </motion.span>
+          Smash that button!
+        </div>
       </motion.div>
 
       {/* Results */}

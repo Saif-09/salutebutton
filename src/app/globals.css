@@ -3,11 +3,38 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* ---- Brand ---- */
+  --color-primary: #F43F5E;
+  --color-primary-light: #FFE4E9;
+  --color-primary-dark: #D6293E;
+
+  --color-secondary: #40A2E3;
+  --color-secondary-light: #9CCFFF;
+  --color-secondary-muted: #EDF2F7;
+
+  --color-accent: #FFDA78;
+  --color-accent-light: #FFF8E1;
+
+  /* ---- Semantic ---- */
+  --color-positive: #34D399;
+  --color-positive-dark: #059669;
+
+  --color-negative: #FF7F3E;
+  --color-negative-dark: #E05A1A;
+
+  /* ---- Surfaces ---- */
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #FFF8E1;
+  --color-muted: #FFF5D6;
+
+  /* ---- Selection / misc ---- */
+  --color-selected: #FF5B5B;
 }
 
-/* Yellow polka dot background — fixed, doesn't scroll */
+/* Warm cream background with scattered emojis — fixed, doesn't scroll */
 body {
-  background-color: #fde68a;
+  background-color: var(--color-surface-alt);
 }
 
 body::before {
@@ -15,14 +42,15 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-color: #fde68a;
-  background-image: radial-gradient(circle, #f87171 2.5px, transparent 2.5px);
-  background-size: 30px 30px;
+  background-color: var(--color-surface-alt);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Ctext x='10' y='30' font-size='20' transform='rotate(-15 10 30)'%3E%F0%9F%AB%A1%3C/text%3E%3Ctext x='80' y='60' font-size='16' transform='rotate(10 80 60)'%3E%F0%9F%94%A5%3C/text%3E%3Ctext x='160' y='25' font-size='18' transform='rotate(-8 160 25)'%3E%E2%AD%90%3C/text%3E%3Ctext x='240' y='50' font-size='14' transform='rotate(20 240 50)'%3E%F0%9F%98%A4%3C/text%3E%3Ctext x='290' y='20' font-size='17' transform='rotate(-12 290 20)'%3E%F0%9F%92%AA%3C/text%3E%3Ctext x='40' y='110' font-size='15' transform='rotate(12 40 110)'%3E%F0%9F%8E%AF%3C/text%3E%3Ctext x='120' y='95' font-size='19' transform='rotate(-20 120 95)'%3E%F0%9F%91%8D%3C/text%3E%3Ctext x='200' y='120' font-size='16' transform='rotate(5 200 120)'%3E%F0%9F%92%80%3C/text%3E%3Ctext x='270' y='100' font-size='18' transform='rotate(-10 270 100)'%3E%F0%9F%8F%86%3C/text%3E%3Ctext x='20' y='180' font-size='17' transform='rotate(18 20 180)'%3E%F0%9F%92%A5%3C/text%3E%3Ctext x='90' y='170' font-size='14' transform='rotate(-5 90 170)'%3E%F0%9F%98%8E%3C/text%3E%3Ctext x='170' y='190' font-size='20' transform='rotate(15 170 190)'%3E%F0%9F%AB%A1%3C/text%3E%3Ctext x='250' y='175' font-size='15' transform='rotate(-18 250 175)'%3E%E2%9C%A8%3C/text%3E%3Ctext x='310' y='160' font-size='16' transform='rotate(8 310 160)'%3E%F0%9F%91%80%3C/text%3E%3Ctext x='50' y='250' font-size='18' transform='rotate(-10 50 250)'%3E%F0%9F%A4%9C%3C/text%3E%3Ctext x='130' y='240' font-size='15' transform='rotate(22 130 240)'%3E%F0%9F%92%9C%3C/text%3E%3Ctext x='210' y='260' font-size='17' transform='rotate(-14 210 260)'%3E%F0%9F%98%A4%3C/text%3E%3Ctext x='280' y='245' font-size='19' transform='rotate(6 280 245)'%3E%F0%9F%94%A5%3C/text%3E%3Ctext x='30' y='310' font-size='16' transform='rotate(10 30 310)'%3E%F0%9F%8E%89%3C/text%3E%3Ctext x='110' y='300' font-size='18' transform='rotate(-16 110 300)'%3E%E2%AD%90%3C/text%3E%3Ctext x='190' y='310' font-size='14' transform='rotate(12 190 310)'%3E%F0%9F%92%AA%3C/text%3E%3Ctext x='260' y='305' font-size='20' transform='rotate(-8 260 305)'%3E%F0%9F%91%8F%3C/text%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  opacity: 0.29;
 }
 
 /* Neo-brutalism card style */
 .neo-brutal {
-  background-color: #fff;
+  background-color: var(--color-surface);
   border: 3px solid #000;
   border-radius: 16px;
   box-shadow: 5px 5px 0px #000;
@@ -48,7 +76,7 @@ body::before {
 
 /* Selection styling */
 ::selection {
-  background-color: #ec4899;
+  background-color: var(--color-primary);
   color: #fff;
 }
 

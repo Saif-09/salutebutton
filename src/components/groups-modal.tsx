@@ -11,11 +11,12 @@ interface GroupsModalProps {
   open: boolean;
   onClose: () => void;
   onOpenLogin: () => void;
+  initialView?: "menu" | "create" | "join" | "my-groups";
 }
 
 type View = "menu" | "create" | "join" | "my-groups";
 
-export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
+export function GroupsModal({ open, onClose, onOpenLogin, initialView }: GroupsModalProps) {
   const router = useRouter();
   const [view, setView] = useState<View>("menu");
   const { isAuthenticated, userId } = useAppSelector((s) => s.auth);
@@ -39,6 +40,10 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (open && initialView) {
+      setView(initialView);
+      if (initialView === "my-groups" && isAuthenticated) fetchMyGroups();
+    }
     if (!open) {
       setTimeout(() => {
         setView("menu");
@@ -53,6 +58,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
         setCopied(false);
       }, 200);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const handleCreate = async () => {
@@ -132,7 +138,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
 
   const renderAuthGate = (action: string) => (
     <div className="flex flex-col items-center gap-4">
-      <div className="w-full rounded-2xl border-3 border-black bg-amber-50 p-6 text-center shadow-[4px_4px_0px_#000]">
+      <div className="w-full rounded-2xl border-3 border-black bg-surface-alt p-6 text-center shadow-[4px_4px_0px_#000]">
         <p className="text-5xl">👮</p>
         <p className="mt-3 text-xl font-black uppercase">Hold up, bro!</p>
         <p className="mt-1.5 text-sm font-semibold text-gray-500">
@@ -140,7 +146,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
         </p>
         <button
           onClick={handleLoginClick}
-          className="mt-5 w-full rounded-xl border-3 border-black bg-emerald-400 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-emerald-500 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+          className="mt-5 w-full rounded-xl border-3 border-black bg-positive px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-positive-dark active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
         >
           🔓 LOGIN NOW
         </button>
@@ -162,7 +168,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
         </div>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-red-500 text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+          className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-negative text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
         >
           ✕
         </button>
@@ -199,11 +205,11 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                 >
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-black uppercase">
-                      GROUPS 👥
+                      GROUPS 👻
                     </h2>
                     <button
                       onClick={onClose}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-red-500 text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-negative text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
                     >
                       ✕
                     </button>
@@ -214,13 +220,13 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => setView("create")}
-                      className="w-full rounded-xl border-3 border-black bg-amber-300 px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                      className="w-full rounded-xl border-3 border-black bg-primary-light px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                     >
                       ⛏️ Create a Group
                     </button>
                     <button
                       onClick={() => setView("join")}
-                      className="w-full rounded-xl border-3 border-black bg-purple-300 px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                      className="w-full rounded-xl border-3 border-black bg-secondary-light px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                     >
                       🤝 Join a Group
                     </button>
@@ -229,7 +235,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                         setView("my-groups");
                         if (isAuthenticated) fetchMyGroups();
                       }}
-                      className="w-full rounded-xl border-3 border-black bg-sky-300 px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                      className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                     >
                       🔍 My Groups
                     </button>
@@ -255,7 +261,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                     renderAuthGate("create a group")
                   ) : createdGroup ? (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-full rounded-2xl border-3 border-black bg-emerald-50 p-5 text-center shadow-[4px_4px_0px_#000]">
+                      <div className="w-full rounded-2xl border-3 border-black bg-surface-alt p-5 text-center shadow-[4px_4px_0px_#000]">
                         <p className="text-4xl">🎉</p>
                         <p className="mt-2 text-lg font-black uppercase">
                           Group Created!
@@ -264,12 +270,12 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                           Share this code with your friends:
                         </p>
                         <div className="mt-3 flex items-center justify-center gap-2">
-                          <span className="rounded-xl border-3 border-black bg-amber-100 px-4 py-2 text-2xl font-black tracking-widest">
+                          <span className="rounded-xl border-3 border-black bg-primary-light px-4 py-2 text-2xl font-black tracking-widest">
                             {createdGroup.code}
                           </span>
                           <button
                             onClick={() => copyCode(createdGroup.code)}
-                            className="rounded-xl border-3 border-black bg-amber-300 px-3 py-2 text-sm font-bold shadow-[3px_3px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+                            className="rounded-xl border-3 border-black bg-primary-light px-3 py-2 text-sm font-bold shadow-[3px_3px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
                           >
                             {copied ? "✅" : "📋"}
                           </button>
@@ -277,7 +283,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                       </div>
                       <button
                         onClick={() => openGroup(createdGroup._id)}
-                        className="w-full rounded-xl border-3 border-black bg-purple-400 px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                        className="w-full rounded-xl border-3 border-black bg-secondary px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                       >
                         🚀 Enter Group
                       </button>
@@ -293,7 +299,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                           placeholder="e.g. The Squad"
                           value={groupName}
                           onChange={(e) => setGroupName(e.target.value)}
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                           maxLength={30}
                         />
                       </div>
@@ -305,7 +311,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                       <button
                         onClick={handleCreate}
                         disabled={!groupName.trim() || creating}
-                        className="w-full rounded-xl border-3 border-black bg-amber-300 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-amber-400 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
+                        className="w-full rounded-xl border-3 border-black bg-primary-light px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-primary active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
                       >
                         {creating ? "Creating..." : "⛏️ Create Group"}
                       </button>
@@ -332,7 +338,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                     renderAuthGate("join a group")
                   ) : joinedGroup ? (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-full rounded-2xl border-3 border-black bg-purple-50 p-5 text-center shadow-[4px_4px_0px_#000]">
+                      <div className="w-full rounded-2xl border-3 border-black bg-secondary-muted p-5 text-center shadow-[4px_4px_0px_#000]">
                         <p className="text-4xl">🤝</p>
                         <p className="mt-2 text-lg font-black uppercase">
                           You&apos;re in!
@@ -343,7 +349,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                       </div>
                       <button
                         onClick={() => openGroup(joinedGroup._id)}
-                        className="w-full rounded-xl border-3 border-black bg-purple-400 px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                        className="w-full rounded-xl border-3 border-black bg-secondary px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                       >
                         🚀 Enter Group
                       </button>
@@ -361,7 +367,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                           onChange={(e) =>
                             setJoinCode(e.target.value.toUpperCase())
                           }
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-center text-lg font-black tracking-widest uppercase outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-center text-lg font-black tracking-widest uppercase outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                           maxLength={6}
                         />
                       </div>
@@ -373,7 +379,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                       <button
                         onClick={handleJoin}
                         disabled={!joinCode.trim() || joining}
-                        className="w-full rounded-xl border-3 border-black bg-purple-300 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-purple-400 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
+                        className="w-full rounded-xl border-3 border-black bg-secondary-light px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-secondary active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
                       >
                         {joining ? "Joining..." : "🤝 Join Group"}
                       </button>
@@ -441,7 +447,7 @@ export function GroupsModal({ open, onClose, onOpenLogin }: GroupsModalProps) {
                               {(g.profiles?.length || 0) !== 1 ? "s" : ""}
                             </p>
                           </div>
-                          <span className="rounded-lg border-2 border-black bg-amber-200 px-2.5 py-1 text-xs font-black shadow-[2px_2px_0px_#000]">
+                          <span className="rounded-lg border-2 border-black bg-accent-light px-2.5 py-1 text-xs font-black shadow-[2px_2px_0px_#000]">
                             {g.code}
                           </span>
                         </motion.button>

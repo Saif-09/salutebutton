@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import { HeroBanner } from "@/components/hero-banner";
+import { GroupsBanner } from "@/components/groups-banner";
 import { TrendingChart } from "@/components/trending-chart";
 import { PersonGrid } from "@/components/person-grid";
 
@@ -9,6 +10,9 @@ export default function HomePage() {
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 pb-12">
         <HeroBanner />
+        <div className="mt-6">
+          <GroupsBanner />
+        </div>
         <div className="mt-6">
           <TrendingChart />
         </div>

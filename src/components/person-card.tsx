@@ -145,7 +145,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
         {/* Category badge */}
         <motion.span
           whileHover={{ scale: 1.1, rotate: -3 }}
-          className="mt-1.5 cursor-default rounded-md border-2 border-black bg-amber-300 px-2.5 py-0.5 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:mt-2.5 sm:rounded-full sm:px-4 sm:py-1 sm:text-xs"
+          className="mt-1.5 cursor-default rounded-md border-2 border-black bg-primary-light px-2.5 py-0.5 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:mt-2.5 sm:rounded-full sm:px-4 sm:py-1 sm:text-xs"
         >
           {celeb.category?.name ?? "Unknown"}
         </motion.span>

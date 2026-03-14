@@ -186,7 +186,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
             {/* ====== LOGIN SUCCESS VIEW ====== */}
             {loginSuccess ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="w-full rounded-xl border-3 border-black bg-emerald-50 p-5 text-center shadow-[4px_4px_0px_#000]">
+                <div className="w-full rounded-xl border-3 border-black bg-surface-alt p-5 text-center shadow-[4px_4px_0px_#000]">
                   <p className="text-4xl">🎉</p>
                   <p className="mt-2 text-lg font-black uppercase">
                     Login Successful!
@@ -234,7 +234,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 <p className="text-lg font-bold">Hey, {currentUser}!</p>
                 <button
                   onClick={handleLogout}
-                  className="rounded-xl border-3 border-black bg-red-500 px-6 py-2.5 text-sm font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                  className="rounded-xl border-3 border-black bg-negative px-6 py-2.5 text-sm font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                 >
                   Logout
                 </button>
@@ -242,7 +242,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
             ) : secretCode ? (
               /* ====== SECRET CODE REVEAL ====== */
               <div className="flex flex-col items-center gap-3">
-                <div className="w-full rounded-xl border-3 border-black bg-emerald-50 p-5 text-center shadow-[4px_4px_0px_#000]">
+                <div className="w-full rounded-xl border-3 border-black bg-surface-alt p-5 text-center shadow-[4px_4px_0px_#000]">
                   <p className="text-4xl">🔑</p>
                   <p className="mt-2 text-lg font-black uppercase">
                     Your Secret Code
@@ -253,12 +253,12 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                   </p>
 
                   <div className="mt-4 flex items-center justify-center gap-2">
-                    <span className="rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-3xl font-black tracking-[0.3em]">
+                    <span className="rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-3xl font-black tracking-[0.3em]">
                       {secretCode}
                     </span>
                     <button
                       onClick={copyCode}
-                      className="rounded-xl border-3 border-black bg-amber-300 px-3 py-3 text-sm font-bold shadow-[3px_3px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+                      className="rounded-xl border-3 border-black bg-primary-light px-3 py-3 text-sm font-bold shadow-[3px_3px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
                     >
                       {copied ? "✅" : "📋"}
                     </button>
@@ -289,7 +289,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                   </h2>
                   <button
                     onClick={onClose}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-red-500 text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border-3 border-black bg-negative text-lg font-black text-white shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
                   >
                     ✕
                   </button>
@@ -321,7 +321,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                               e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ""),
                             )
                           }
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                           maxLength={20}
                         />
                       </div>
@@ -338,7 +338,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                           onChange={(e) =>
                             setPhone(e.target.value.replace(/[^0-9]/g, ""))
                           }
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                         />
                       </div>
 
@@ -395,7 +395,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                               e.target.value.replace(/[^0-9]/g, ""),
                             )
                           }
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                         />
                       </div>
 
@@ -413,7 +413,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                               e.target.value.toLowerCase().slice(0, 7),
                             )
                           }
-                          className="w-full rounded-xl border-3 border-black bg-amber-100 px-4 py-3 text-center text-lg font-black tracking-[0.2em] outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-center text-lg font-black tracking-[0.2em] outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                           maxLength={7}
                         />
                       </div>

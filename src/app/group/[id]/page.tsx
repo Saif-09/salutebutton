@@ -13,14 +13,14 @@ import type { Group, GroupProfile } from "@/types";
 
 const TILTS = [-2, 1.5, 2, -1.5, -1, 2.5, 1, -2.5];
 const ROW_COLORS = [
-  "bg-amber-400",
-  "bg-amber-300",
-  "bg-gray-200",
-  "bg-orange-300",
   "bg-orange-200",
+  "bg-rose-100",
   "bg-amber-100",
-  "bg-gray-100",
+  "bg-sky-100",
   "bg-orange-100",
+  "bg-stone-100",
+  "bg-red-50",
+  "bg-blue-50",
 ];
 
 type Tab = "profiles" | "leaderboard" | "members" | "add-profile";
@@ -241,7 +241,7 @@ export default function GroupPage({
         <p className="text-lg font-black uppercase">Group not found</p>
         <Link
           href="/"
-          className="rounded-xl border-3 border-black bg-rose-400 px-5 py-2.5 text-sm font-black uppercase text-white shadow-[4px_4px_0px_#000]"
+          className="rounded-xl border-3 border-black bg-negative px-5 py-2.5 text-sm font-black uppercase text-white shadow-[4px_4px_0px_#000]"
         >
           ← Go Home
         </Link>
@@ -260,7 +260,7 @@ export default function GroupPage({
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-1 rounded-xl border-3 border-black bg-rose-400 px-3 py-2 text-xs font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-y-[2px] active:shadow-[2px_2px_0px_#000] sm:px-5 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"
+              className="inline-flex items-center gap-1 rounded-xl border-3 border-black bg-negative px-3 py-2 text-xs font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-y-[2px] active:shadow-[2px_2px_0px_#000] sm:px-5 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"
             >
               ← Home
             </Link>
@@ -273,7 +273,7 @@ export default function GroupPage({
           >
             <button
               onClick={copyCode}
-              className="rounded-xl border-3 border-black bg-amber-300 px-3 py-2 text-xs font-black shadow-[3px_3px_0px_#000] transition-all active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-4 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"
+              className="rounded-xl border-3 border-black bg-primary-light px-3 py-2 text-xs font-black shadow-[3px_3px_0px_#000] transition-all active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-4 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"
             >
               {copied ? "Copied! ✅" : `📋 ${group.code}`}
             </button>
@@ -296,12 +296,12 @@ export default function GroupPage({
             damping: 12,
           }}
           whileHover={{ rotate: 0, scale: 1.02 }}
-          className="mt-2 mb-6 cursor-default rounded-2xl border-3 border-black bg-purple-500 px-6 py-5 shadow-[5px_5px_0px_#000] sm:mt-0 sm:mb-8 sm:border-4 sm:px-12 sm:py-8 sm:shadow-[8px_8px_0px_#000]"
+          className="mt-2 mb-6 cursor-default rounded-2xl border-3 border-black bg-secondary px-6 py-5 shadow-[5px_5px_0px_#000] sm:mt-0 sm:mb-8 sm:border-4 sm:px-12 sm:py-8 sm:shadow-[8px_8px_0px_#000]"
         >
           <h1 className="text-center text-2xl leading-tight font-black uppercase tracking-tight text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] sm:text-5xl lg:text-6xl">
             {group.name}
           </h1>
-          <p className="mt-1 text-center text-xs font-bold text-purple-200 uppercase sm:mt-2 sm:text-sm">
+          <p className="mt-1 text-center text-xs font-bold text-secondary-muted uppercase sm:mt-2 sm:text-sm">
             {isAdmin ? "👑 You are the Admin" : "👥 Member"} &middot;{" "}
             {group.profiles.length} profile
             {group.profiles.length !== 1 ? "s" : ""} &middot;{" "}
@@ -315,13 +315,13 @@ export default function GroupPage({
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="hide-scrollbar sticky top-[44px] z-40 -mx-4 mb-8 flex items-center justify-center gap-2 overflow-x-auto bg-[#fde68a] px-4 py-3 sm:top-[52px] sm:mb-10 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:py-4"
+          className="hide-scrollbar sticky top-[44px] z-40 -mx-4 mb-8 flex items-center justify-center gap-2 overflow-x-auto bg-surface-alt px-4 py-3 sm:top-[52px] sm:mb-10 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:py-4"
         >
           {(
             [
-              { key: "profiles", label: "🫡 Profiles", color: "bg-emerald-400" },
-              { key: "leaderboard", label: "🏆 Leaderboard", color: "bg-amber-400" },
-              { key: "members", label: "👥 Members", color: "bg-sky-400" },
+              { key: "profiles", label: "🫡 Profiles", color: "bg-positive" },
+              { key: "leaderboard", label: "🏆 Leaderboard", color: "bg-primary" },
+              { key: "members", label: "👥 Members", color: "bg-secondary-light" },
             ] as const
           ).map((t, i) => (
             <motion.button
@@ -389,7 +389,7 @@ export default function GroupPage({
                         setProfileImage("");
                         setProfileError("");
                       }}
-                      className="mt-6 rounded-xl border-3 border-black bg-purple-400 px-8 py-4 text-base font-black uppercase text-white shadow-[5px_5px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:px-10 sm:py-5 sm:text-lg"
+                      className="mt-6 rounded-xl border-3 border-black bg-secondary px-8 py-4 text-base font-black uppercase text-white shadow-[5px_5px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:px-10 sm:py-5 sm:text-lg"
                     >
                       ➕ Add First Profile
                     </motion.button>
@@ -412,7 +412,7 @@ export default function GroupPage({
                         setProfileImage("");
                         setProfileError("");
                       }}
-                      className="rounded-xl border-3 border-black bg-purple-400 px-8 py-3.5 text-sm font-black uppercase text-white shadow-[5px_5px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:px-10 sm:py-4 sm:text-base"
+                      className="rounded-xl border-3 border-black bg-secondary px-8 py-3.5 text-sm font-black uppercase text-white shadow-[5px_5px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:px-10 sm:py-4 sm:text-base"
                     >
                       ➕ Add More Profiles ({group.profiles.length}/10)
                     </motion.button>
@@ -521,7 +521,7 @@ export default function GroupPage({
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ rotate: -1, scale: 1, opacity: 1 }}
                 transition={{ type: "spring" as const, stiffness: 150 }}
-                className="mb-6 rounded-2xl border-3 border-black bg-amber-400 px-6 py-4 shadow-[5px_5px_0px_#000] sm:border-4 sm:px-10 sm:py-6 sm:shadow-[8px_8px_0px_#000]"
+                className="mb-6 rounded-2xl border-3 border-black bg-primary px-6 py-4 shadow-[5px_5px_0px_#000] sm:border-4 sm:px-10 sm:py-6 sm:shadow-[8px_8px_0px_#000]"
               >
                 <h2 className="text-center text-xl font-black uppercase sm:text-4xl">
                   🏆 Most Saluted
@@ -582,7 +582,7 @@ export default function GroupPage({
                       {/* Score */}
                       <motion.div
                         whileHover={{ scale: 1.1 }}
-                        className="flex shrink-0 items-center gap-0.5 rounded-lg border-2 border-black bg-emerald-400 px-2 py-1 font-black shadow-[2px_2px_0px_#000] sm:gap-1 sm:rounded-xl sm:border-3 sm:px-4 sm:py-2 sm:shadow-[3px_3px_0px_#000]"
+                        className="flex shrink-0 items-center gap-0.5 rounded-lg border-2 border-black bg-positive px-2 py-1 font-black shadow-[2px_2px_0px_#000] sm:gap-1 sm:rounded-xl sm:border-3 sm:px-4 sm:py-2 sm:shadow-[3px_3px_0px_#000]"
                       >
                         <span className="text-sm sm:text-lg">🫡</span>
                         <span className="text-xs tabular-nums sm:text-base">
@@ -613,7 +613,7 @@ export default function GroupPage({
                   transition={{ delay: i * 0.04 }}
                   className="flex items-center gap-3 rounded-xl border-3 border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000] sm:rounded-2xl sm:border-4 sm:px-6 sm:py-4 sm:shadow-[4px_4px_0px_#000]"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-purple-100 text-xl sm:h-14 sm:w-14 sm:border-3 sm:text-2xl">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-secondary-muted text-xl sm:h-14 sm:w-14 sm:border-3 sm:text-2xl">
                     👤
                   </div>
                   <div className="flex-1">
@@ -622,7 +622,7 @@ export default function GroupPage({
                     </p>
                   </div>
                   {m._id === group.createdBy._id && (
-                    <span className="rounded-lg border-2 border-black bg-amber-300 px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:px-3 sm:text-xs">
+                    <span className="rounded-lg border-2 border-black bg-accent px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:px-3 sm:text-xs">
                       👑 Admin
                     </span>
                   )}
@@ -684,7 +684,7 @@ export default function GroupPage({
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
-                      className="mb-2 w-full rounded-xl border-3 border-black bg-amber-300 px-4 py-3 text-sm font-black uppercase shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50 sm:text-base"
+                      className="mb-2 w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-sm font-black uppercase shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50 sm:text-base"
                     >
                       {uploading
                         ? "Uploading..."
@@ -751,7 +751,7 @@ export default function GroupPage({
                       !profileImage.trim() ||
                       addingProfile
                     }
-                    className="w-full rounded-xl border-3 border-black bg-purple-400 px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50 sm:text-lg"
+                    className="w-full rounded-xl border-3 border-black bg-secondary px-5 py-3.5 text-base font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50 sm:text-lg"
                   >
                     {addingProfile ? "Adding..." : "➕ Add Profile"}
                   </button>

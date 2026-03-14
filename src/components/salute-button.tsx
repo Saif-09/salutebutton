@@ -92,7 +92,7 @@ export function SaluteButton({
         whileTap={{ scale: 0.95, y: 2 }}
         onClick={handleClick}
         className={cn(
-          "relative flex select-none items-center gap-1 rounded-xl border-3 border-black bg-emerald-400 px-3 py-1.5 font-black transition-all sm:gap-1.5 sm:px-4 sm:py-2",
+          "relative flex select-none items-center gap-1 rounded-xl border-3 border-black bg-positive px-3 py-1.5 font-black transition-all sm:gap-1.5 sm:px-4 sm:py-2",
           pressed
             ? "translate-y-[3px] shadow-[1px_1px_0px_#000]"
             : "shadow-[4px_4px_0px_#000] hover:shadow-[5px_5px_0px_#000]",

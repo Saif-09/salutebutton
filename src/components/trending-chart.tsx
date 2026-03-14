@@ -6,22 +6,7 @@ import Image from "next/image";
 import { api } from "@/lib/api";
 import { getSocket } from "@/lib/socket";
 import type { Celeb } from "@/types";
-
-const SALUTE_BAR_COLORS = [
-  "bg-emerald-400",
-  "bg-cyan-400",
-  "bg-violet-400",
-  "bg-amber-400",
-  "bg-lime-400",
-];
-
-const HATE_BAR_COLORS = [
-  "bg-rose-400",
-  "bg-orange-400",
-  "bg-fuchsia-400",
-  "bg-red-300",
-  "bg-pink-400",
-];
+import { SALUTE_BAR_COLORS, HATE_BAR_COLORS } from "@/lib/theme";
 
 const RANK_EMOJIS_SALUTE = ["🥇", "🥈", "🥉", "4", "5"];
 const RANK_EMOJIS_HATE = ["💀", "☠️", "👹", "4", "5"];
@@ -152,7 +137,7 @@ export function TrendingChart() {
     >
       {/* Zigzag top */}
       <div
-        className={`absolute top-0 right-0 left-0 h-1.5 ${isSalute ? "bg-emerald-400" : "bg-rose-400"}`}
+        className={`absolute top-0 right-0 left-0 h-1.5 ${isSalute ? "bg-positive" : "bg-primary"}`}
         style={{
           clipPath:
             "polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)",
@@ -172,10 +157,10 @@ export function TrendingChart() {
         <div className="flex items-center gap-1.5 rounded-full border-2 border-black bg-white px-2.5 py-1 shadow-[2px_2px_0px_#000] sm:px-3">
           <span className="relative flex h-2 w-2">
             <span
-              className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${isSalute ? "bg-emerald-400" : "bg-rose-400"}`}
+              className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${isSalute ? "bg-positive" : "bg-primary"}`}
             />
             <span
-              className={`relative inline-flex h-2 w-2 rounded-full ${isSalute ? "bg-emerald-500" : "bg-rose-500"}`}
+              className={`relative inline-flex h-2 w-2 rounded-full ${isSalute ? "bg-positive-dark" : "bg-primary-dark"}`}
             />
           </span>
           <span className="text-[8px] font-black uppercase sm:text-[10px]">
@@ -192,8 +177,8 @@ export function TrendingChart() {
           onClick={() => setActiveTab("salute")}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border-3 border-black px-3 py-2.5 text-xs font-black uppercase sm:gap-2 sm:rounded-2xl sm:px-5 sm:py-3 sm:text-sm ${
             isSalute
-              ? "bg-emerald-400 shadow-[4px_4px_0px_#000]"
-              : "bg-gray-100 shadow-[2px_2px_0px_#000]"
+              ? "bg-positive shadow-[4px_4px_0px_#000]"
+              : "bg-muted shadow-[2px_2px_0px_#000]"
           }`}
         >
           <span className="text-base sm:text-lg">🫡</span>
@@ -205,8 +190,8 @@ export function TrendingChart() {
           onClick={() => setActiveTab("hate")}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border-3 border-black px-3 py-2.5 text-xs font-black uppercase sm:gap-2 sm:rounded-2xl sm:px-5 sm:py-3 sm:text-sm ${
             !isSalute
-              ? "bg-rose-400 text-white shadow-[4px_4px_0px_#000]"
-              : "bg-gray-100 shadow-[2px_2px_0px_#000]"
+              ? "bg-primary text-white shadow-[4px_4px_0px_#000]"
+              : "bg-muted shadow-[2px_2px_0px_#000]"
           }`}
         >
           <span className="text-base sm:text-lg">😤</span>
@@ -232,7 +217,7 @@ export function TrendingChart() {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               className={`relative mb-5 flex items-center gap-3 rounded-2xl border-3 border-black px-4 py-4 shadow-[5px_5px_0px_#000] sm:mb-7 sm:gap-5 sm:rounded-2xl sm:border-4 sm:px-6 sm:py-5 sm:shadow-[7px_7px_0px_#000] ${
-                isSalute ? "bg-amber-300" : "bg-rose-300"
+                isSalute ? "bg-primary-light" : "bg-rose-200"
               }`}
             >
               {/* Corner emoji */}
@@ -277,7 +262,7 @@ export function TrendingChart() {
               <motion.div
                 whileHover={{ scale: 1.08, rotate: -3 }}
                 className={`flex shrink-0 flex-col items-center gap-0.5 rounded-xl border-3 border-black px-3 py-2 font-black shadow-[3px_3px_0px_#000] sm:rounded-2xl sm:border-4 sm:px-5 sm:py-3 sm:shadow-[4px_4px_0px_#000] ${
-                  isSalute ? "bg-emerald-400" : "bg-rose-500 text-white"
+                  isSalute ? "bg-positive" : "bg-primary text-white"
                 }`}
               >
                 <span className="text-xl sm:text-3xl">
@@ -334,9 +319,9 @@ export function TrendingChart() {
                       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-black text-sm font-black shadow-[2px_2px_0px_#000] sm:h-9 sm:w-9 sm:rounded-xl sm:text-base ${
                         isTopThree
                           ? isSalute
-                            ? "bg-amber-300"
-                            : "bg-rose-300"
-                          : "bg-gray-200"
+                            ? "bg-primary-light"
+                            : "bg-rose-200"
+                          : "bg-muted"
                       }`}
                     >
                       {isTopThree ? (
@@ -365,7 +350,7 @@ export function TrendingChart() {
                     </span>
 
                     {/* Striped bar */}
-                    <div className="relative h-8 flex-1 overflow-hidden rounded-xl border-2 border-black bg-gray-100 shadow-[2px_2px_0px_#000] sm:h-10 sm:rounded-2xl sm:border-3">
+                    <div className="relative h-8 flex-1 overflow-hidden rounded-xl border-2 border-black bg-muted shadow-[2px_2px_0px_#000] sm:h-10 sm:rounded-2xl sm:border-3">
                       <motion.div
                         animate={{ width: `${pct}%` }}
                         transition={{
@@ -415,7 +400,7 @@ export function TrendingChart() {
 
       {/* Zigzag bottom */}
       <div
-        className={`absolute right-0 bottom-0 left-0 h-1.5 ${isSalute ? "bg-violet-400" : "bg-orange-400"}`}
+        className={`absolute right-0 bottom-0 left-0 h-1.5 ${isSalute ? "bg-secondary-light" : "bg-primary"}`}
         style={{
           clipPath:
             "polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)",
