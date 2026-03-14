@@ -14,10 +14,10 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-3 px-2 py-2">
+      <div className="flex items-center gap-2 rounded-xl border-3 border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] transition-shadow focus-within:shadow-[5px_5px_0px_#000] sm:px-4 sm:py-2.5 sm:shadow-[4px_4px_0px_#000]">
         <motion.span
           animate={{ rotate: focused ? 20 : 0 }}
-          className="text-2xl text-gray-400"
+          className="text-lg text-gray-400 sm:text-xl"
         >
           🔍
         </motion.span>
@@ -31,8 +31,8 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
           onKeyDown={(e) => {
             if (e.key === "Escape") inputRef.current?.blur();
           }}
-          placeholder="FIND SOMEONE TO SALUTE!"
-          className="w-full bg-transparent text-sm font-bold uppercase tracking-wide text-black outline-none placeholder:text-gray-400 sm:text-lg"
+          placeholder="Find someone to salute..."
+          className="w-full bg-transparent text-xs font-bold text-black outline-none placeholder:text-gray-400 sm:text-sm"
         />
         <AnimatePresence>
           {value && (
@@ -41,15 +41,13 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
               onClick={() => onChange("")}
-              className="text-xl"
+              className="text-sm font-bold text-gray-400"
             >
               ✕
             </motion.button>
           )}
         </AnimatePresence>
       </div>
-      {/* Thick black divider */}
-      <div className="mt-2 h-1 w-full rounded-full bg-black" />
     </div>
   );
 }

@@ -44,20 +44,36 @@ export function Navbar() {
             <span className="hidden sm:inline">Menu</span>
           </motion.button>
 
-          {/* Right — Leaderboard */}
-          <motion.div
-            custom={1}
-            initial="hidden"
-            animate="visible"
-            variants={navItemVariants}
-          >
-            <Link
-              href="/leaderboard"
-              className="block rounded-xl border-3 border-black bg-accent px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_#000] transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#000] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-5 sm:py-2 sm:text-sm sm:shadow-[3px_3px_0px_#000]"
+          {/* Right — Login (if not auth) + Leaderboard */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {!isAuthenticated && (
+              <motion.button
+                custom={1}
+                initial="hidden"
+                animate="visible"
+                variants={navItemVariants}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95, y: 2 }}
+                onClick={() => setLoginOpen(true)}
+                className="rounded-xl border-3 border-black bg-secondary-light px-3 py-1.5 text-xs font-black uppercase text-white shadow-[2px_2px_0px_#000] transition-shadow hover:shadow-[4px_4px_0px_#000] active:shadow-[1px_1px_0px_#000] sm:px-5 sm:py-2 sm:text-sm sm:shadow-[3px_3px_0px_#000]"
+              >
+                🔐 Login
+              </motion.button>
+            )}
+            <motion.div
+              custom={isAuthenticated ? 1 : 2}
+              initial="hidden"
+              animate="visible"
+              variants={navItemVariants}
             >
-              🏆 Leaderboard
-            </Link>
-          </motion.div>
+              <Link
+                href="/leaderboard"
+                className="block rounded-xl border-3 border-black bg-accent px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_#000] transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#000] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-5 sm:py-2 sm:text-sm sm:shadow-[3px_3px_0px_#000]"
+              >
+                🏆 Leaderboard
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </nav>
 

@@ -76,12 +76,12 @@ export function PersonGrid() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Search + Categories container */}
+      {/* Search + Categories */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="neo-brutal mx-auto w-full max-w-5xl bg-surface-alt px-4 py-5 sm:px-8 sm:py-8 md:px-12"
+        className="mx-auto mt-4 w-full max-w-3xl sm:mt-6"
       >
         <SearchBar value={search} onChange={setSearch} />
         <CategoryFilter

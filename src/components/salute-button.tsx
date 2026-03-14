@@ -2,15 +2,10 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatCount } from "@/lib/utils";
+import { playSaluteSound } from "@/lib/sounds";
 import { SALUTE_EMOJIS } from "@/constants/site";
 import type { Particle } from "@/types";
-
-function formatCount(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return n.toString();
-}
 
 interface SaluteButtonProps {
   initialCount: number;
@@ -47,8 +42,9 @@ export function SaluteButton({
     onPress?.();
 
     if (navigator.vibrate) {
-      navigator.vibrate(50);
+      navigator.vibrate([10, 30, 40, 20, 15]);
     }
+    playSaluteSound();
 
     const emoji =
       SALUTE_EMOJIS[Math.floor(Math.random() * SALUTE_EMOJIS.length)];
@@ -92,7 +88,7 @@ export function SaluteButton({
         whileTap={{ scale: 0.95, y: 2 }}
         onClick={handleClick}
         className={cn(
-          "relative flex select-none items-center gap-1 rounded-xl border-3 border-black bg-positive px-3 py-1.5 font-black transition-all sm:gap-1.5 sm:px-4 sm:py-2",
+          "relative flex max-w-full select-none items-center gap-1 overflow-hidden rounded-xl border-3 border-black bg-positive px-2 py-1 font-black transition-all sm:gap-1.5 sm:px-4 sm:py-2",
           pressed
             ? "translate-y-[3px] shadow-[1px_1px_0px_#000]"
             : "shadow-[4px_4px_0px_#000] hover:shadow-[5px_5px_0px_#000]",

@@ -5,18 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { cn, formatCount } from "@/lib/utils";
 import type { Celeb, Category } from "@/types";
 import { ROW_COLORS } from "@/lib/theme";
 
 function getRowColor(index: number) {
   return ROW_COLORS[index % ROW_COLORS.length];
-}
-
-function formatCount(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return n.toString();
 }
 
 export default function LeaderboardPage() {

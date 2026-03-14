@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SaluteButton } from "./salute-button";
 import { DisrespectButton } from "./disrespect-button";
 import { api } from "@/lib/api";
@@ -18,6 +18,7 @@ const TILTS = [-2, 1.5, 2, -1.5, -1, 2.5, 1, -2.5];
 export function PersonCard({ celeb, index }: PersonCardProps) {
   const tilt = TILTS[index % TILTS.length];
   const cardRef = useRef<HTMLDivElement>(null);
+  const [showInfo, setShowInfo] = useState(false);
   const animRef = useRef<Animation | null>(null);
 
   const popCard = useCallback(() => {
@@ -106,6 +107,32 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
     }
   };
 
+  // Live counts for the info tooltip
+  const [infoSalute, setInfoSalute] = useState(celeb.respectors);
+  const [infoDispite, setInfoDispite] = useState(celeb.dispiters);
+
+  useEffect(() => {
+    const onSalute = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d.celebId === celeb._id) setInfoSalute(d.respectors);
+    };
+    const onDispite = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d.celebId === celeb._id) setInfoDispite(d.dispiters);
+    };
+    window.addEventListener("salute-update", onSalute);
+    window.addEventListener("dispite-update", onDispite);
+    return () => {
+      window.removeEventListener("salute-update", onSalute);
+      window.removeEventListener("dispite-update", onDispite);
+    };
+  }, [celeb._id]);
+
+  useEffect(() => {
+    setInfoSalute((p) => Math.max(p, celeb.respectors));
+    setInfoDispite((p) => Math.max(p, celeb.dispiters));
+  }, [celeb.respectors, celeb.dispiters]);
+
   return (
     <div ref={cardRef}>
       <motion.div
@@ -119,8 +146,41 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
           damping: 18,
         }}
         whileHover={{ rotate: 0, y: -8, scale: 1.04 }}
-        className="neo-brutal relative flex flex-col items-center bg-white px-3 pb-4 pt-12 sm:px-6 sm:pb-8 sm:pt-20"
+        className="neo-brutal relative flex flex-col items-center bg-white px-3 pb-4 pt-12 sm:px-6 sm:pb-6 sm:pt-20"
       >
+        {/* Info button — only show when any count > 999 */}
+        {(infoSalute > 999 || infoDispite > 999) && (
+          <>
+            <motion.button
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowInfo((v) => !v)}
+              className="absolute top-2 right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-accent text-[10px] font-black shadow-[1px_1px_0px_#000] sm:top-3 sm:right-3 sm:h-6 sm:w-6 sm:text-xs"
+              aria-label="Show exact counts"
+            >
+              i
+            </motion.button>
+
+            {/* Info tooltip */}
+            <AnimatePresence>
+              {showInfo && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: -5 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: -5 }}
+                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+                  className="absolute top-8 right-2 z-20 rounded-lg border-2 border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] sm:top-10 sm:right-3"
+                >
+                  <div className="flex flex-col gap-1 text-[10px] font-bold sm:text-xs">
+                    <span>🫡 {infoSalute.toLocaleString()}</span>
+                    <span>😤 {infoDispite.toLocaleString()}</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
+
         {/* Circular image — overlaps the top edge */}
         <motion.div
           whileHover={{ scale: 1.1, rotate: 5 }}
@@ -153,24 +213,28 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
         {/* Dashed separator */}
         <div className="my-2 w-full border-t-2 border-dashed border-gray-300 sm:my-3" />
 
-        {/* Comment/description in quotes */}
+        {/* Comment/description as a quote bubble */}
         {celeb.comment && (
-          <p className="mb-2 line-clamp-2 text-center text-[10px] italic text-gray-500 sm:mb-3 sm:text-sm">
-            &ldquo;{celeb.comment}&rdquo;
-          </p>
+          <div className="mb-2.5 w-full rounded-lg border border-gray-200 bg-gray-50/80 px-2.5 py-1.5 sm:mb-3 sm:rounded-xl sm:px-3 sm:py-2">
+            <p className="line-clamp-2 text-center text-[10px] leading-relaxed italic text-gray-500 sm:text-sm">
+              &ldquo;{celeb.comment}&rdquo;
+            </p>
+          </div>
         )}
 
-        {/* Buttons */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Buttons — always side by side, scale down to fit */}
+        <div className="flex w-full items-center justify-center gap-1.5 sm:gap-3">
           <SaluteButton
             initialCount={celeb.respectors}
             onSalute={handleSalute}
             onPress={handleSalutePress}
+            className="min-w-0"
           />
           <DisrespectButton
             initialCount={celeb.dispiters}
             onDisrespect={handleDisrespect}
             onPress={handleDispitePress}
+            className="min-w-0"
           />
         </div>
       </motion.div>

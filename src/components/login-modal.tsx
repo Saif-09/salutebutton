@@ -11,29 +11,45 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
-type View = "join" | "login";
+type View = "join" | "login" | "forgot" | "forgot-answer";
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
-  const [view, setView] = useState<View>("join");
+  const [view, setView] = useState<View>("login");
 
   // Join (signup) state
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
 
   // Login state
   const [loginPhone, setLoginPhone] = useState("");
   const [loginCode, setLoginCode] = useState("");
 
+  // Forgot code state
+  const [forgotPhone, setForgotPhone] = useState("");
+  const [forgotAnswer, setForgotAnswer] = useState("");
+  const [forgotQuestion, setForgotQuestion] = useState("");
+
   // Shared state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Secret code reveal after signup
+  // Secret code reveal after signup or reset
   const [secretCode, setSecretCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   // Login success popup
   const [loginSuccess, setLoginSuccess] = useState(false);
+
+  const SECURITY_QUESTIONS = [
+    "What is your pet's name?",
+    "What city were you born in?",
+    "What is your favorite movie?",
+    "What is your mother's maiden name?",
+    "What was your first school's name?",
+    "What is your favorite food?",
+  ];
 
   const dispatch = useAppDispatch();
   const { isAuthenticated, username: currentUser } = useAppSelector(
@@ -43,18 +59,27 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const resetForm = () => {
     setUsername("");
     setPhone("");
+    setSecurityQuestion("");
+    setSecurityAnswer("");
     setLoginPhone("");
     setLoginCode("");
+    setForgotPhone("");
+    setForgotAnswer("");
+    setForgotQuestion("");
     setError("");
     setSecretCode(null);
     setCopied(false);
     setLoginSuccess(false);
-    setView("join");
+    setView("login");
   };
 
   const handleJoin = async () => {
     if (!username.trim() || !phone.trim()) {
       setError("Both fields are required");
+      return;
+    }
+    if (!securityQuestion || !securityAnswer.trim()) {
+      setError("Security question and answer are required");
       return;
     }
 
@@ -68,6 +93,8 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         body: JSON.stringify({
           username: username.trim(),
           phone: phone.trim(),
+          securityQuestion,
+          securityAnswer: securityAnswer.trim(),
         }),
       });
 
@@ -151,6 +178,77 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     dispatch(logout());
     resetForm();
     onClose();
+  };
+
+  // Step 1: Enter phone, get security question back
+  const handleForgotLookup = async () => {
+    if (!forgotPhone.trim()) {
+      setError("Phone number is required");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // We send a dummy answer to get the error or question
+      // Instead, let's just proceed to answer step — the user picks from the same questions
+      // Actually, we need to know which question to ask. Let's add a lookup step.
+      const res = await api("/api/users/forgot-passcode/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: forgotPhone.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong");
+        return;
+      }
+
+      setForgotQuestion(data.securityQuestion);
+      setView("forgot-answer");
+    } catch {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Answer security question, get new code
+  const handleForgotReset = async () => {
+    if (!forgotAnswer.trim()) {
+      setError("Please answer the security question");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await api("/api/users/forgot-passcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: forgotPhone.trim(),
+          securityAnswer: forgotAnswer.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid answer");
+        return;
+      }
+
+      setSecretCode(data.secretCode);
+    } catch {
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const copyCode = () => {
@@ -280,12 +378,16 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 </button>
               </div>
             ) : (
-              /* ====== JOIN / LOGIN FORM ====== */
+              /* ====== JOIN / LOGIN / FORGOT FORM ====== */
               <>
                 {/* Header with title and close button */}
                 <div className="flex items-start justify-between">
                   <h2 className="text-2xl font-black uppercase">
-                    {view === "join" ? "JOIN IN! 🚀" : "WELCOME BACK! 🔐"}
+                    {view === "join"
+                      ? "JOIN IN! 🚀"
+                      : view === "login"
+                        ? "WELCOME BACK! 🔐"
+                        : "FORGOT CODE? 🔑"}
                   </h2>
                   <button
                     onClick={onClose}
@@ -342,6 +444,43 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         />
                       </div>
 
+                      {/* Security Question */}
+                      <div>
+                        <label className="mb-1.5 block text-sm font-black uppercase">
+                          SECURITY QUESTION
+                        </label>
+                        <select
+                          value={securityQuestion}
+                          onChange={(e) => setSecurityQuestion(e.target.value)}
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                        >
+                          <option value="">Select a question...</option>
+                          {SECURITY_QUESTIONS.map((q) => (
+                            <option key={q} value={q}>
+                              {q}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Security Answer */}
+                      <div>
+                        <label className="mb-1.5 block text-sm font-black uppercase">
+                          YOUR ANSWER
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Your answer..."
+                          value={securityAnswer}
+                          onChange={(e) => setSecurityAnswer(e.target.value)}
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          maxLength={100}
+                        />
+                        <p className="mt-1 text-xs font-semibold text-gray-400">
+                          Remember this! It helps recover your secret code.
+                        </p>
+                      </div>
+
                       {error && (
                         <p className="text-sm font-bold text-red-500">
                           {error}
@@ -373,7 +512,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         </button>
                       </p>
                     </motion.div>
-                  ) : (
+                  ) : view === "login" ? (
                     <motion.div
                       key="login"
                       initial={{ opacity: 0, x: 15 }}
@@ -435,17 +574,151 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         </button>
                       </div>
 
-                      {/* Switch to join */}
-                      <p className="text-center text-xs font-bold text-gray-400">
-                        Don&apos;t have an account?{" "}
+                      {/* Forgot code + Switch to join */}
+                      <div className="flex flex-col items-center gap-1">
                         <button
                           onClick={() => {
-                            setView("join");
+                            setView("forgot");
+                            setError("");
+                          }}
+                          className="text-xs font-black text-black underline"
+                        >
+                          Forgot your secret code?
+                        </button>
+                        <p className="text-xs font-bold text-gray-400">
+                          Don&apos;t have an account?{" "}
+                          <button
+                            onClick={() => {
+                              setView("join");
+                              setError("");
+                            }}
+                            className="font-black text-black underline"
+                          >
+                            Join here
+                          </button>
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : view === "forgot" ? (
+                    /* ====== FORGOT CODE — STEP 1: ENTER PHONE ====== */
+                    <motion.div
+                      key="forgot"
+                      initial={{ opacity: 0, x: 15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -15 }}
+                      className="flex flex-col gap-4"
+                    >
+                      <p className="text-sm font-semibold text-gray-500">
+                        Enter your phone number to recover your secret code.
+                      </p>
+
+                      {/* Phone Number */}
+                      <div>
+                        <label className="mb-1.5 block text-sm font-black uppercase">
+                          PHONE NUMBER
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="999-999-9999"
+                          value={forgotPhone}
+                          onChange={(e) =>
+                            setForgotPhone(
+                              e.target.value.replace(/[^0-9]/g, ""),
+                            )
+                          }
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                        />
+                      </div>
+
+                      {error && (
+                        <p className="text-sm font-bold text-red-500">
+                          {error}
+                        </p>
+                      )}
+
+                      <div className="mt-2">
+                        <button
+                          onClick={handleForgotLookup}
+                          disabled={loading}
+                          className="w-full rounded-xl border-3 border-black bg-gray-200 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-gray-300 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
+                        >
+                          {loading ? "LOOKING UP..." : "NEXT →"}
+                        </button>
+                      </div>
+
+                      <p className="text-center text-xs font-bold text-gray-400">
+                        Remember your code?{" "}
+                        <button
+                          onClick={() => {
+                            setView("login");
                             setError("");
                           }}
                           className="font-black text-black underline"
                         >
-                          Join here
+                          Login here
+                        </button>
+                      </p>
+                    </motion.div>
+                  ) : (
+                    /* ====== FORGOT CODE — STEP 2: ANSWER QUESTION ====== */
+                    <motion.div
+                      key="forgot-answer"
+                      initial={{ opacity: 0, x: 15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -15 }}
+                      className="flex flex-col gap-4"
+                    >
+                      {/* Security Question Display */}
+                      <div className="rounded-xl border-3 border-black bg-surface-alt px-4 py-3">
+                        <p className="text-xs font-bold uppercase text-gray-400">
+                          YOUR SECURITY QUESTION
+                        </p>
+                        <p className="mt-1 text-base font-black">
+                          {forgotQuestion}
+                        </p>
+                      </div>
+
+                      {/* Answer Input */}
+                      <div>
+                        <label className="mb-1.5 block text-sm font-black uppercase">
+                          YOUR ANSWER
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Type your answer..."
+                          value={forgotAnswer}
+                          onChange={(e) => setForgotAnswer(e.target.value)}
+                          className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          maxLength={100}
+                        />
+                      </div>
+
+                      {error && (
+                        <p className="text-sm font-bold text-red-500">
+                          {error}
+                        </p>
+                      )}
+
+                      <div className="mt-2">
+                        <button
+                          onClick={handleForgotReset}
+                          disabled={loading}
+                          className="w-full rounded-xl border-3 border-black bg-gray-200 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:bg-gray-300 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] disabled:opacity-50"
+                        >
+                          {loading ? "VERIFYING..." : "RESET MY CODE 🔑"}
+                        </button>
+                      </div>
+
+                      <p className="text-center text-xs font-bold text-gray-400">
+                        <button
+                          onClick={() => {
+                            setView("forgot");
+                            setError("");
+                            setForgotAnswer("");
+                          }}
+                          className="font-black text-black underline"
+                        >
+                          ← Back
                         </button>
                       </p>
                     </motion.div>

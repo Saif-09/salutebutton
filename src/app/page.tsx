@@ -9,7 +9,9 @@ export default function HomePage() {
     <>
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 pb-12">
-        <HeroBanner />
+        <div className="mt-5 sm:mt-6">
+          <HeroBanner />
+        </div>
         <div className="mt-6">
           <GroupsBanner />
         </div>

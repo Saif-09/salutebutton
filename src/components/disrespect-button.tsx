@@ -2,16 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, formatCount } from "@/lib/utils";
+import { playDisrespectSound } from "@/lib/sounds";
 import type { Particle } from "@/types";
 
 const ANGRY_EMOJIS = ["😤", "💢", "🔥", "👎", "💀"];
-
-function formatCount(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return n.toString();
-}
 
 interface DisrespectButtonProps {
   initialCount: number;
@@ -48,8 +43,9 @@ export function DisrespectButton({
     onPress?.();
 
     if (navigator.vibrate) {
-      navigator.vibrate([30, 50, 30]);
+      navigator.vibrate([40, 20, 60, 30, 20, 40, 30]);
     }
+    playDisrespectSound();
 
     const emoji =
       ANGRY_EMOJIS[Math.floor(Math.random() * ANGRY_EMOJIS.length)];
@@ -93,7 +89,7 @@ export function DisrespectButton({
         whileTap={{ scale: 0.95, y: 2 }}
         onClick={handleClick}
         className={cn(
-          "relative flex select-none items-center gap-1 rounded-xl border-3 border-black bg-primary px-3 py-1.5 font-black text-white transition-all sm:gap-1.5 sm:px-4 sm:py-2",
+          "relative flex max-w-full select-none items-center gap-1 overflow-hidden rounded-xl border-3 border-black bg-primary px-2 py-1 font-black text-white transition-all sm:gap-1.5 sm:px-4 sm:py-2",
           pressed
             ? "translate-y-[3px] shadow-[1px_1px_0px_#000]"
             : "shadow-[4px_4px_0px_#000] hover:shadow-[5px_5px_0px_#000]",
