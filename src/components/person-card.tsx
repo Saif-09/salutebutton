@@ -40,13 +40,22 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
   const lastSyncedSalute = useRef(celeb.respectors);
   const lastSyncedDispite = useRef(celeb.dispiters);
   const liveSaluteCount = useRef(celeb.respectors);
+  const liveDispiteCount = useRef(celeb.dispiters);
 
   const handleSalutePress = useCallback(() => {
-    // Fires on every click — broadcast instantly for trending chart
     liveSaluteCount.current += 1;
     window.dispatchEvent(
       new CustomEvent("salute-update", {
         detail: { celebId: celeb._id, respectors: liveSaluteCount.current },
+      }),
+    );
+  }, [celeb._id]);
+
+  const handleDispitePress = useCallback(() => {
+    liveDispiteCount.current += 1;
+    window.dispatchEvent(
+      new CustomEvent("dispite-update", {
+        detail: { celebId: celeb._id, dispiters: liveDispiteCount.current },
       }),
     );
   }, [celeb._id]);
@@ -149,6 +158,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
           <DisrespectButton
             initialCount={celeb.dispiters}
             onDisrespect={handleDisrespect}
+            onPress={handleDispitePress}
           />
         </div>
       </motion.div>

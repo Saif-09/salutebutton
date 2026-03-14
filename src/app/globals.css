@@ -66,3 +66,20 @@ body::before {
 .animate-card-shake {
   animation: card-shake 0.4s ease-in-out;
 }
+
+/* Trending chart — striped bars */
+@keyframes stripe-slide {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 0; }
+}
+
+.funky-bar {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 6px,
+    rgba(0, 0, 0, 0.07) 6px,
+    rgba(0, 0, 0, 0.07) 12px
+  );
+  animation: stripe-slide 1s linear infinite;
+}
