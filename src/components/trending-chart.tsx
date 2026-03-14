@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import Image from "next/image";
 import { api } from "@/lib/api";
+import { getSocket } from "@/lib/socket";
 import type { Celeb } from "@/types";
 
 const SALUTE_BAR_COLORS = [
@@ -73,6 +74,7 @@ export function TrendingChart() {
     setTimeout(() => setFlashId(null), 600);
   }, []);
 
+  // Local custom events (optimistic, same-tab)
   useEffect(() => {
     window.addEventListener("salute-update", handleSaluteUpdate);
     window.addEventListener("dispite-update", handleDispiteUpdate);
@@ -81,6 +83,34 @@ export function TrendingChart() {
       window.removeEventListener("dispite-update", handleDispiteUpdate);
     };
   }, [handleSaluteUpdate, handleDispiteUpdate]);
+
+  // Socket.IO events (cross-user, from server)
+  useEffect(() => {
+    const socket = getSocket();
+    const handleServerReaction = (data: {
+      celebId: string;
+      respectors: number;
+      dispiters: number;
+    }) => {
+      setAllCelebs((prev) =>
+        prev.map((c) =>
+          c._id === data.celebId
+            ? {
+                ...c,
+                respectors: Math.max(c.respectors, data.respectors),
+                dispiters: Math.max(c.dispiters, data.dispiters),
+              }
+            : c,
+        ),
+      );
+      setFlashId(data.celebId);
+      setTimeout(() => setFlashId(null), 600);
+    };
+    socket.on("celeb-reaction", handleServerReaction);
+    return () => {
+      socket.off("celeb-reaction", handleServerReaction);
+    };
+  }, []);
 
   if (loading) {
     return (

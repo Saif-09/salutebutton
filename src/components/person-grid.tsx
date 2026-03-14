@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PersonCard } from "./person-card";
 import { SearchBar } from "./search-bar";
 import { CategoryFilter } from "./category-filter";
 import { api } from "@/lib/api";
+import { getSocket } from "@/lib/socket";
 import type { Celeb, Category } from "@/types";
 
 export function PersonGrid() {
@@ -46,6 +47,32 @@ export function PersonGrid() {
     const timeout = setTimeout(fetchCelebs, 300);
     return () => clearTimeout(timeout);
   }, [fetchCelebs]);
+
+  // Socket.IO: update counts from other users in real-time
+  useEffect(() => {
+    const socket = getSocket();
+    const handleReaction = (data: {
+      celebId: string;
+      respectors: number;
+      dispiters: number;
+    }) => {
+      setCelebs((prev) =>
+        prev.map((c) =>
+          c._id === data.celebId
+            ? {
+                ...c,
+                respectors: Math.max(c.respectors, data.respectors),
+                dispiters: Math.max(c.dispiters, data.dispiters),
+              }
+            : c,
+        ),
+      );
+    };
+    socket.on("celeb-reaction", handleReaction);
+    return () => {
+      socket.off("celeb-reaction", handleReaction);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-8">

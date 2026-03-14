@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { SaluteButton } from "./salute-button";
@@ -41,6 +41,18 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
   const lastSyncedDispite = useRef(celeb.dispiters);
   const liveSaluteCount = useRef(celeb.respectors);
   const liveDispiteCount = useRef(celeb.dispiters);
+
+  // Keep refs in sync when server counts arrive (from other users)
+  useEffect(() => {
+    if (celeb.respectors > liveSaluteCount.current) {
+      liveSaluteCount.current = celeb.respectors;
+      lastSyncedSalute.current = celeb.respectors;
+    }
+    if (celeb.dispiters > liveDispiteCount.current) {
+      liveDispiteCount.current = celeb.dispiters;
+      lastSyncedDispite.current = celeb.dispiters;
+    }
+  }, [celeb.respectors, celeb.dispiters]);
 
   const handleSalutePress = useCallback(() => {
     liveSaluteCount.current += 1;

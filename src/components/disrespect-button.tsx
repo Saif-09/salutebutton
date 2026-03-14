@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { Particle } from "@/types";
@@ -30,6 +30,13 @@ export function DisrespectButton({
   const [particles, setParticles] = useState<Particle[]>([]);
   const [pressed, setPressed] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync with server count (from other users via socket)
+  useEffect(() => {
+    if (initialCount > count) {
+      setCount(initialCount);
+    }
+  }, [initialCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = useCallback(() => {
     const newCount = count + 1;
