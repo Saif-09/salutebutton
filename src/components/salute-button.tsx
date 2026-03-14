@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, formatCount } from "@/lib/utils";
-import { playSaluteSound } from "@/lib/sounds";
+import { playSaluteSound, triggerHaptic } from "@/lib/sounds";
 import { SALUTE_EMOJIS } from "@/constants/site";
 import type { Particle } from "@/types";
 
@@ -41,9 +41,7 @@ export function SaluteButton({
 
     onPress?.();
 
-    if (navigator.vibrate) {
-      navigator.vibrate([10, 30, 40, 20, 15]);
-    }
+    triggerHaptic([10, 30, 40, 20, 15]);
     playSaluteSound();
 
     const emoji =

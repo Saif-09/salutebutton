@@ -3,6 +3,7 @@ import { HeroBanner } from "@/components/hero-banner";
 import { GroupsBanner } from "@/components/groups-banner";
 import { TrendingChart } from "@/components/trending-chart";
 import { PersonGrid } from "@/components/person-grid";
+import { Footer } from "@/components/footer";
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ export default function HomePage() {
           <PersonGrid />
         </div>
       </main>
+      <Footer />
     </>
   );
 }

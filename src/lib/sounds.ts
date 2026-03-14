@@ -1,12 +1,30 @@
 /**
  * Funky sound effects using the Web Audio API — no audio files needed.
+ * Handles mobile browser restrictions (suspended AudioContext, iOS quirks).
  */
 
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext {
-  if (!ctx) ctx = new AudioContext();
+  if (!ctx) {
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    ctx = new AC();
+  }
+  // Mobile browsers start AudioContext in "suspended" — resume on user gesture.
+  if (ctx.state === "suspended") {
+    ctx.resume();
+  }
   return ctx;
+}
+
+/**
+ * Trigger haptic feedback on supported devices.
+ * Uses navigator.vibrate on Android; no-ops on iOS (unsupported).
+ */
+export function triggerHaptic(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    navigator.vibrate(pattern);
+  }
 }
 
 /** Cheerful ascending "pop-bling" for the salute button. */

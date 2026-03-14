@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, formatCount } from "@/lib/utils";
-import { playDisrespectSound } from "@/lib/sounds";
+import { playDisrespectSound, triggerHaptic } from "@/lib/sounds";
 import type { Particle } from "@/types";
 
 const ANGRY_EMOJIS = ["😤", "💢", "🔥", "👎", "💀"];
@@ -42,9 +42,7 @@ export function DisrespectButton({
 
     onPress?.();
 
-    if (navigator.vibrate) {
-      navigator.vibrate([40, 20, 60, 30, 20, 40, 30]);
-    }
+    triggerHaptic([40, 20, 60, 30, 20, 40, 30]);
     playDisrespectSound();
 
     const emoji =

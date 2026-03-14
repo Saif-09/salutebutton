@@ -9,6 +9,7 @@ import { hydrateAuth } from "@/store/slices/auth-slice";
 import { api } from "@/lib/api";
 import { SaluteButton } from "@/components/salute-button";
 import { DisrespectButton } from "@/components/disrespect-button";
+import { Footer } from "@/components/footer";
 import type { Group, GroupProfile } from "@/types";
 
 const TILTS = [-2, 1.5, 2, -1.5, -1, 2.5, 1, -2.5];
@@ -761,6 +762,7 @@ export default function GroupPage({
           )}
         </AnimatePresence>
       </main>
+      <Footer />
     </div>
   );
 }

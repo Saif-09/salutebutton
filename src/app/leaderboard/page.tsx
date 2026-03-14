@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { cn, formatCount } from "@/lib/utils";
 import type { Celeb, Category } from "@/types";
 import { ROW_COLORS } from "@/lib/theme";
+import { Footer } from "@/components/footer";
 
 function getRowColor(index: number) {
   return ROW_COLORS[index % ROW_COLORS.length];
@@ -244,6 +245,7 @@ export default function LeaderboardPage() {
           </AnimatePresence>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
