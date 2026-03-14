@@ -39,12 +39,25 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
 
   const lastSyncedSalute = useRef(celeb.respectors);
   const lastSyncedDispite = useRef(celeb.dispiters);
+  const liveSaluteCount = useRef(celeb.respectors);
+
+  const handleSalutePress = useCallback(() => {
+    // Fires on every click — broadcast instantly for trending chart
+    liveSaluteCount.current += 1;
+    window.dispatchEvent(
+      new CustomEvent("salute-update", {
+        detail: { celebId: celeb._id, respectors: liveSaluteCount.current },
+      }),
+    );
+  }, [celeb._id]);
 
   const handleSalute = async (count: number) => {
     popCard();
+    liveSaluteCount.current = count;
     const delta = count - lastSyncedSalute.current;
     lastSyncedSalute.current = count;
     if (delta <= 0) return;
+
     try {
       await api(`/api/celebs/${celeb._id}/reactions`, {
         method: "PATCH",
@@ -131,6 +144,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
           <SaluteButton
             initialCount={celeb.respectors}
             onSalute={handleSalute}
+            onPress={handleSalutePress}
           />
           <DisrespectButton
             initialCount={celeb.dispiters}
