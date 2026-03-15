@@ -253,7 +253,7 @@ export default function GroupPage({
   return (
     <div className="min-h-screen">
       {/* ====== STICKY TOP BAR ====== */}
-      <div className="sticky top-0 z-50 px-3 py-2 sm:px-4 sm:py-3">
+      <div className="px-3 py-2 sm:px-4 sm:py-3">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -316,7 +316,7 @@ export default function GroupPage({
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="hide-scrollbar sticky top-[44px] z-40 -mx-4 mb-8 flex items-center justify-center gap-2 overflow-x-auto bg-surface-alt px-4 py-3 sm:top-[52px] sm:mb-10 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:py-4"
+          className="hide-scrollbar -mx-4 mb-8 flex items-center justify-center gap-2 overflow-x-auto bg-surface-alt px-4 py-3 sm:mb-10 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:py-4"
         >
           {(
             [

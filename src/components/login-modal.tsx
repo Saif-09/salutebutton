@@ -42,6 +42,17 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   // Login success popup
   const [loginSuccess, setLoginSuccess] = useState(false);
 
+  const isValidPhone = (p: string) => {
+    if (!/^[6-9]\d{9}$/.test(p)) return false;
+    // Reject all same digit (6666666666, etc.)
+    if (/^(\d)\1{9}$/.test(p)) return false;
+    // Reject repeating 2-digit pattern (9191919191, etc.)
+    if (/^(\d{2})\1{4}$/.test(p)) return false;
+    // Reject one digit followed by all zeros (9000000000, etc.)
+    if (/^[6-9]0{9}$/.test(p)) return false;
+    return true;
+  };
+
   const SECURITY_QUESTIONS = [
     "What is your pet's name?",
     "What city were you born in?",
@@ -76,6 +87,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const handleJoin = async () => {
     if (!username.trim() || !phone.trim()) {
       setError("Both fields are required");
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      setError("Enter a valid 10-digit Indian mobile number");
       return;
     }
     if (!securityQuestion || !securityAnswer.trim()) {
@@ -128,6 +143,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const handleLogin = async () => {
     if (!loginPhone.trim() || !loginCode.trim()) {
       setError("Phone and secret code are required");
+      return;
+    }
+    if (!isValidPhone(loginPhone)) {
+      setError("Enter a valid 10-digit Indian mobile number");
       return;
     }
 
@@ -184,6 +203,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const handleForgotLookup = async () => {
     if (!forgotPhone.trim()) {
       setError("Phone number is required");
+      return;
+    }
+    if (!isValidPhone(forgotPhone)) {
+      setError("Enter a valid 10-digit Indian mobile number");
       return;
     }
 
@@ -371,10 +394,26 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 </div>
 
                 <button
-                  onClick={handleDone}
+                  onClick={() => {
+                    if (isAuthenticated) {
+                      // Signup flow — user is already logged in
+                      handleDone();
+                    } else {
+                      // Forgot password flow — redirect to login with phone pre-filled
+                      setLoginPhone(forgotPhone);
+                      setLoginCode("");
+                      setSecretCode(null);
+                      setForgotPhone("");
+                      setForgotAnswer("");
+                      setForgotQuestion("");
+                      setError("");
+                      setCopied(false);
+                      setView("login");
+                    }
+                  }}
                   className="w-full rounded-xl border-3 border-black bg-gray-200 px-5 py-3.5 text-base font-black uppercase shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                 >
-                  I&apos;VE SAVED IT ✅
+                  {isAuthenticated ? "I'VE SAVED IT ✅" : "LOGIN NOW →"}
                 </button>
               </div>
             ) : (
@@ -435,12 +474,13 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         </label>
                         <input
                           type="tel"
-                          placeholder="999-999-9999"
+                          placeholder="9876543210"
                           value={phone}
                           onChange={(e) =>
-                            setPhone(e.target.value.replace(/[^0-9]/g, ""))
+                            setPhone(e.target.value.replace(/[^0-9]/g, "").slice(0, 10))
                           }
                           className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          maxLength={10}
                         />
                       </div>
 
@@ -527,14 +567,15 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         </label>
                         <input
                           type="tel"
-                          placeholder="999-999-9999"
+                          placeholder="9876543210"
                           value={loginPhone}
                           onChange={(e) =>
                             setLoginPhone(
-                              e.target.value.replace(/[^0-9]/g, ""),
+                              e.target.value.replace(/[^0-9]/g, "").slice(0, 10),
                             )
                           }
                           className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          maxLength={10}
                         />
                       </div>
 
@@ -619,14 +660,15 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                         </label>
                         <input
                           type="tel"
-                          placeholder="999-999-9999"
+                          placeholder="9876543210"
                           value={forgotPhone}
                           onChange={(e) =>
                             setForgotPhone(
-                              e.target.value.replace(/[^0-9]/g, ""),
+                              e.target.value.replace(/[^0-9]/g, "").slice(0, 10),
                             )
                           }
                           className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
+                          maxLength={10}
                         />
                       </div>
 

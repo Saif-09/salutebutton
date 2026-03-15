@@ -27,7 +27,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 px-2 pt-2 sm:px-4 sm:pt-3">
+      <nav className="px-2 pt-2 sm:px-4 sm:pt-3">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-1 sm:px-2">
           {/* Left — Menu drawer toggle */}
           <motion.button

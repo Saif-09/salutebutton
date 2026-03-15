@@ -176,12 +176,12 @@ export function Footer() {
               >
                 🏆 Leaderboard
               </Link>
-              <Link
-                href="/"
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className="rounded-xl border-3 border-black bg-positive px-3 py-1.5 text-[10px] font-black uppercase shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_#000] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000] sm:px-4 sm:py-2 sm:text-xs"
               >
                 🫡 Start Saluting
-              </Link>
+              </button>
             </div>
           </div>
 

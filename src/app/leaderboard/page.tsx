@@ -51,7 +51,7 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen">
       {/* Combined header */}
-      <div className="sticky top-0 z-50 px-2 pt-2 sm:px-4 sm:pt-3">
+      <div className="mb-4 px-2 pt-2 sm:mb-6 sm:px-4 sm:pt-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
