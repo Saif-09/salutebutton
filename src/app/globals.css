@@ -74,7 +74,22 @@ body::before {
   scrollbar-width: none;
 }
 
-/* Selection styling */
+/* Disable text selection globally */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow selection in inputs/textareas */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 ::selection {
   background-color: var(--color-primary);
   color: #fff;
