@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { SaluteButton } from "./salute-button";
 import { DisrespectButton } from "./disrespect-button";
+import { ShareButton } from "./share-button";
 import { api } from "@/lib/api";
 import type { Celeb } from "@/types";
 
@@ -19,6 +20,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
   const tilt = TILTS[index % TILTS.length];
   const cardRef = useRef<HTMLDivElement>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const animRef = useRef<Animation | null>(null);
 
   const popCard = useCallback(() => {
@@ -134,7 +136,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
   }, [celeb.respectors, celeb.dispiters]);
 
   return (
-    <div ref={cardRef}>
+    <div ref={cardRef} className={shareOpen ? "relative z-50" : "relative"}>
       <motion.div
         initial={{ opacity: 0, y: 40, rotate: 0, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, rotate: tilt, scale: 1 }}
@@ -148,6 +150,15 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
         whileHover={{ rotate: 0, y: -8, scale: 1.04 }}
         className="neo-brutal relative flex flex-col items-center bg-white px-3 pb-4 pt-12 sm:px-6 sm:pb-6 sm:pt-20"
       >
+        {/* Share button */}
+        <ShareButton
+          celebId={celeb._id}
+          celebName={celeb.name}
+          respectors={infoSalute}
+          className="absolute top-2 right-2 z-10 sm:top-3 sm:right-3"
+          onToggle={setShareOpen}
+        />
+
         {/* Info button — only show when any count > 999 */}
         {(infoSalute > 999 || infoDispite > 999) && (
           <>
@@ -155,7 +166,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setShowInfo((v) => !v)}
-              className="absolute top-2 right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-accent text-[10px] font-black shadow-[1px_1px_0px_#000] sm:top-3 sm:right-3 sm:h-6 sm:w-6 sm:text-xs"
+              className="absolute top-2 left-2 z-10 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-accent text-[10px] font-black shadow-[1px_1px_0px_#000] sm:top-3 sm:left-3 sm:h-6 sm:w-6 sm:text-xs"
               aria-label="Show exact counts"
             >
               i
@@ -169,7 +180,7 @@ export function PersonCard({ celeb, index }: PersonCardProps) {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.8, y: -5 }}
                   transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
-                  className="absolute top-8 right-2 z-20 rounded-lg border-2 border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] sm:top-10 sm:right-3"
+                  className="absolute top-8 left-2 z-20 rounded-lg border-2 border-black bg-white px-3 py-2 shadow-[3px_3px_0px_#000] sm:top-10 sm:left-3"
                 >
                   <div className="flex flex-col gap-1 text-[10px] font-bold sm:text-xs">
                     <span>🫡 {infoSalute.toLocaleString()}</span>
