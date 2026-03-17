@@ -12,11 +12,12 @@ interface GroupsModalProps {
   onClose: () => void;
   onOpenLogin: () => void;
   initialView?: "menu" | "create" | "join" | "my-groups";
+  initialCode?: string;
 }
 
 type View = "menu" | "create" | "join" | "my-groups";
 
-export function GroupsModal({ open, onClose, onOpenLogin, initialView }: GroupsModalProps) {
+export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCode }: GroupsModalProps) {
   const router = useRouter();
   const [view, setView] = useState<View>("menu");
   const { isAuthenticated, userId } = useAppSelector((s) => s.auth);
@@ -43,6 +44,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView }: GroupsM
     if (open && initialView) {
       setView(initialView);
       if (initialView === "my-groups" && isAuthenticated) fetchMyGroups();
+      if (initialView === "join" && initialCode) setJoinCode(initialCode);
     }
     if (!open) {
       setTimeout(() => {

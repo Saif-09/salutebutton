@@ -9,11 +9,12 @@ import { api } from "@/lib/api";
 interface LoginModalProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 type View = "join" | "login" | "forgot" | "forgot-answer";
 
-export function LoginModal({ open, onClose }: LoginModalProps) {
+export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
   const [view, setView] = useState<View>("login");
 
   // Join (signup) state
@@ -283,6 +284,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   };
 
   const handleDone = () => {
+    onSuccess?.();
     resetForm();
     onClose();
   };

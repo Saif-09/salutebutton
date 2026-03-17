@@ -9,6 +9,7 @@ import { hydrateAuth } from "@/store/slices/auth-slice";
 import { api } from "@/lib/api";
 import { SaluteButton } from "@/components/salute-button";
 import { DisrespectButton } from "@/components/disrespect-button";
+import { ShareButton } from "@/components/share-button";
 import { Footer } from "@/components/footer";
 import type { Group, GroupProfile } from "@/types";
 
@@ -68,6 +69,9 @@ export default function GroupPage({
 
   // Leaderboard
   const [leaderboard, setLeaderboard] = useState<GroupProfile[]>([]);
+
+  // Track which card has its share menu open (to elevate z-index)
+  const [shareOpenFor, setShareOpenFor] = useState<string | null>(null);
 
   const isOriginalAdmin = !!(resolvedUserId && group?.createdBy?._id === resolvedUserId);
   const isAdmin = !!(resolvedUserId && (
@@ -477,8 +481,8 @@ export default function GroupPage({
                 )}
                 <div className="mx-auto mt-[50px] grid max-w-lg grid-cols-2 gap-x-4 gap-y-12 sm:mt-8 sm:max-w-none sm:grid-cols-3 sm:gap-x-5 sm:gap-y-16 lg:grid-cols-4">
                   {group.profiles.map((p, i) => (
+                    <div key={p._id} className={shareOpenFor === p._id ? "relative z-50" : "relative"}>
                     <motion.div
-                      key={p._id}
                       initial={{ opacity: 0, y: 40, scale: 0.9 }}
                       animate={{
                         opacity: 1,
@@ -497,6 +501,18 @@ export default function GroupPage({
                       className={`neo-brutal relative flex flex-col items-center bg-white px-3 pb-4 pt-12 sm:px-6 sm:pb-6 sm:pt-20 ${shakeKey[p._id] ? "animate-card-shake" : ""}`}
                       style={shakeKey[p._id] ? { animationIterationCount: "infinite" } : undefined}
                     >
+                      {/* Share button — same position/style as person-card */}
+                      <ShareButton
+                        celebId={p._id}
+                        celebName={p.name}
+                        respectors={p.respectors}
+                        className="absolute top-2 right-2 z-10 sm:top-3 sm:right-3"
+                        onToggle={(open) => setShareOpenFor(open ? p._id : null)}
+                        customShareUrl={`${window.location.origin}/join/${group.code}?profile=${p._id}`}
+                        customShareText={`"${p.name}" — ${p.description.slice(0, 80)}${p.description.length > 80 ? "..." : ""}\nVote in "${group.name}" on SaluteButton! 🫡`}
+                        customShareTitle={`${p.name} on SaluteButton`}
+                      />
+
                       {/* Circular image */}
                       <motion.div
                         whileHover={{ scale: 1.1, rotate: 5 }}
@@ -557,6 +573,7 @@ export default function GroupPage({
                         </button>
                       )}
                     </motion.div>
+                    </div>
                   ))}
                 </div>
 

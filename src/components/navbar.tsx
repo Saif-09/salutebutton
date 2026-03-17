@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FeedbackModal } from "./feedback-modal";
 import { LoginModal } from "./login-modal";
@@ -18,12 +19,47 @@ const navItemVariants = {
 };
 
 export function Navbar() {
+  const router = useRouter();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [groupsOpen, setGroupsOpen] = useState(false);
-  const [groupsInitialView, setGroupsInitialView] = useState<"menu" | "my-groups">("menu");
+  const [groupsInitialView, setGroupsInitialView] = useState<"menu" | "create" | "join" | "my-groups">("menu");
+  const [groupsInitialCode, setGroupsInitialCode] = useState<string | undefined>(undefined);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated, username } = useAppSelector((s) => s.auth);
+  const pendingJoinCodeRef = useRef<string | null>(null);
+
+  // Handle ?join=CODE URL param — auto-open login or groups modal
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const joinCode = params.get("join");
+    if (!joinCode) return;
+
+    // Remove the param from the URL without navigation
+    router.replace("/", { scroll: false });
+
+    if (isAuthenticated) {
+      setGroupsInitialView("join");
+      setGroupsInitialCode(joinCode);
+      setGroupsOpen(true);
+    } else {
+      pendingJoinCodeRef.current = joinCode;
+      setLoginOpen(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLoginSuccess = () => {
+    if (pendingJoinCodeRef.current) {
+      const code = pendingJoinCodeRef.current;
+      pendingJoinCodeRef.current = null;
+      setTimeout(() => {
+        setGroupsInitialView("join");
+        setGroupsInitialCode(code);
+        setGroupsOpen(true);
+      }, 200);
+    }
+  };
 
   return (
     <>
@@ -167,12 +203,13 @@ export function Navbar() {
         open={feedbackOpen}
         onClose={() => setFeedbackOpen(false)}
       />
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onSuccess={handleLoginSuccess} />
       <GroupsModal
         open={groupsOpen}
-        onClose={() => setGroupsOpen(false)}
+        onClose={() => { setGroupsOpen(false); setGroupsInitialCode(undefined); }}
         onOpenLogin={() => setLoginOpen(true)}
         initialView={groupsInitialView}
+        initialCode={groupsInitialCode}
       />
     </>
   );

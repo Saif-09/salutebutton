@@ -11,9 +11,13 @@ interface ShareButtonProps {
   className?: string;
   onToggle?: (open: boolean) => void;
   size?: "default" | "large";
+  // Optional overrides — when provided, used instead of the default celeb share content
+  customShareUrl?: string;
+  customShareText?: string;
+  customShareTitle?: string;
 }
 
-export function ShareButton({ celebId, celebName, respectors, className = "", onToggle, size = "default" }: ShareButtonProps) {
+export function ShareButton({ celebId, celebName, respectors, className = "", onToggle, size = "default", customShareUrl, customShareText, customShareTitle }: ShareButtonProps) {
   const lg = size === "large";
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -36,8 +40,8 @@ export function ShareButton({ celebId, celebName, respectors, className = "", on
     return () => window.removeEventListener("share-menu-open", onOtherOpen);
   }, [celebId, showMenu, onToggle]);
 
-  const shareText = `${celebName} has ${respectors.toLocaleString()} salutes on SaluteButton! Cast your vote now`;
-  const shareUrl = `${siteConfig.url}/celeb/${celebId}`;
+  const shareText = customShareText ?? `${celebName} has ${respectors.toLocaleString()} salutes on SaluteButton! Cast your vote now`;
+  const shareUrl = customShareUrl ?? `${siteConfig.url}/celeb/${celebId}`;
 
   const handleWhatsApp = useCallback(() => {
     const url = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
@@ -61,7 +65,7 @@ export function ShareButton({ celebId, celebName, respectors, className = "", on
   const handleNativeShare = useCallback(async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: `${celebName} on SaluteButton`, text: shareText, url: shareUrl });
+        await navigator.share({ title: customShareTitle ?? `${celebName} on SaluteButton`, text: shareText, url: shareUrl });
       } catch {
         // User cancelled or share failed
       }
