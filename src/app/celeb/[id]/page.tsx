@@ -86,9 +86,10 @@ export default async function CelebPage({
           </div>
           <Link
             href="/"
-            className="neo-brutal mt-10 inline-flex items-center gap-2 bg-primary px-6 py-3 text-sm font-black uppercase tracking-wide transition-transform hover:-translate-y-1 hover:scale-105 sm:text-base"
+            className="neo-brutal mt-10 inline-flex items-center gap-2 px-8 py-3 text-sm font-black uppercase tracking-wide text-white transition-transform hover:-translate-y-1 hover:scale-105 sm:text-base"
+            style={{ backgroundColor: "#D6293E" }}
           >
-            Explore More
+            Explore More 🫡
           </Link>
         </div>
       </main>
