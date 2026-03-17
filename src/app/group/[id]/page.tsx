@@ -69,7 +69,11 @@ export default function GroupPage({
   // Leaderboard
   const [leaderboard, setLeaderboard] = useState<GroupProfile[]>([]);
 
-  const isAdmin = !!(resolvedUserId && group?.createdBy?._id === resolvedUserId);
+  const isOriginalAdmin = !!(resolvedUserId && group?.createdBy?._id === resolvedUserId);
+  const isAdmin = !!(resolvedUserId && (
+    group?.createdBy?._id === resolvedUserId ||
+    group?.admins?.some((a) => a._id === resolvedUserId)
+  ));
   const isMember = group?.members?.some((m) => m._id === resolvedUserId);
 
   useEffect(() => {
@@ -149,6 +153,34 @@ export default function GroupPage({
     try {
       const res = await api(`/api/groups/${id}/profiles/${profileId}`, {
         method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (res.ok) setGroup(data);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    try {
+      const res = await api(`/api/groups/${id}/members/${memberId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (res.ok) setGroup(data);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handlePromoteToAdmin = async (memberId: string) => {
+    try {
+      const res = await api(`/api/groups/${id}/admins/${memberId}`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       });
@@ -327,7 +359,7 @@ export default function GroupPage({
             {group.name}
           </h1>
           <p className="mt-1 text-center text-xs font-bold text-secondary-muted uppercase sm:mt-2 sm:text-sm">
-            {isAdmin ? "👑 You are the Admin" : "👥 Member"} &middot;{" "}
+            {isOriginalAdmin ? "👑 You are the Admin" : isAdmin ? "⭐ You are an Admin" : "👥 Member"} &middot;{" "}
             {group.profiles.length} profile
             {group.profiles.length !== 1 ? "s" : ""} &middot;{" "}
             {group.members.length} member
@@ -630,29 +662,62 @@ export default function GroupPage({
               exit={{ opacity: 0, y: -10 }}
               className="flex flex-col gap-2.5 sm:gap-3"
             >
-              {group.members.map((m, i) => (
-                <motion.div
-                  key={m._id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="flex items-center gap-3 rounded-xl border-3 border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000] sm:rounded-2xl sm:border-4 sm:px-6 sm:py-4 sm:shadow-[4px_4px_0px_#000]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-secondary-muted text-xl sm:h-14 sm:w-14 sm:border-3 sm:text-2xl">
-                    👤
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-black uppercase sm:text-lg">
-                      {m.username}
-                    </p>
-                  </div>
-                  {m._id === group.createdBy._id && (
-                    <span className="rounded-lg border-2 border-black bg-accent px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:px-3 sm:text-xs">
-                      👑 Admin
-                    </span>
-                  )}
-                </motion.div>
-              ))}
+              {group.members.map((m, i) => {
+                const isOwner = m._id === group.createdBy._id;
+                const isPromotedAdmin = !isOwner && group.admins?.some((a) => a._id === m._id);
+                const isSelf = m._id === resolvedUserId;
+                // Can this member be removed? Any admin can remove non-owner, non-self members;
+                // but only original admin can remove promoted admins.
+                const canRemove = isAdmin && !isOwner && !isSelf && (
+                  !isPromotedAdmin || isOriginalAdmin
+                );
+                // Can this member be promoted? Any admin can promote regular (non-admin) members.
+                const canPromote = isAdmin && !isOwner && !isPromotedAdmin && !isSelf;
+                return (
+                  <motion.div
+                    key={m._id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="flex items-center gap-3 rounded-xl border-3 border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000] sm:rounded-2xl sm:border-4 sm:px-6 sm:py-4 sm:shadow-[4px_4px_0px_#000]"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-secondary-muted text-xl sm:h-14 sm:w-14 sm:border-3 sm:text-2xl">
+                      👤
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-black uppercase sm:text-lg">
+                        {m.username}
+                      </p>
+                    </div>
+                    {isOwner && (
+                      <span className="rounded-lg border-2 border-black bg-accent px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:px-3 sm:text-xs">
+                        👑 Admin
+                      </span>
+                    )}
+                    {isPromotedAdmin && (
+                      <span className="rounded-lg border-2 border-black bg-primary-light px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] sm:px-3 sm:text-xs">
+                        ⭐ Admin
+                      </span>
+                    )}
+                    {canPromote && (
+                      <button
+                        onClick={() => handlePromoteToAdmin(m._id)}
+                        className="rounded-lg border-2 border-black bg-yellow-100 px-2.5 py-1 text-[10px] font-bold text-yellow-700 shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] sm:text-xs"
+                      >
+                        ⭐ Make Admin
+                      </button>
+                    )}
+                    {canRemove && (
+                      <button
+                        onClick={() => handleRemoveMember(m._id)}
+                        className="rounded-lg border-2 border-black bg-red-100 px-2.5 py-1 text-[10px] font-bold text-red-600 shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] sm:text-xs"
+                      >
+                        🚫 Remove
+                      </button>
+                    )}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
 

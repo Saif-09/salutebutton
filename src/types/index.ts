@@ -56,6 +56,7 @@ export type Group = {
   name: string;
   code: string;
   createdBy: { _id: string; username: string };
+  admins: { _id: string; username: string }[];
   members: { _id: string; username: string }[];
   profiles: GroupProfile[];
   createdAt: string;
