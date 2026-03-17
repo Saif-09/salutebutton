@@ -67,11 +67,21 @@ export default function GroupPage({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Edit mode — admin can toggle to reveal remove buttons
+  const [editMode, setEditMode] = useState(false);
+
   // Leaderboard
   const [leaderboard, setLeaderboard] = useState<GroupProfile[]>([]);
 
   // Track which card has its share menu open (to elevate z-index)
   const [shareOpenFor, setShareOpenFor] = useState<string | null>(null);
+
+  // Leave / delete group
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [leaveError, setLeaveError] = useState("");
 
   const isOriginalAdmin = !!(resolvedUserId && group?.createdBy?._id === resolvedUserId);
   const isAdmin = !!(resolvedUserId && (
@@ -181,6 +191,20 @@ export default function GroupPage({
     }
   };
 
+  const handleDemoteAdmin = async (memberId: string) => {
+    try {
+      const res = await api(`/api/groups/${id}/admins/${memberId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (res.ok) setGroup(data);
+    } catch {
+      // ignore
+    }
+  };
+
   const handlePromoteToAdmin = async (memberId: string) => {
     try {
       const res = await api(`/api/groups/${id}/admins/${memberId}`, {
@@ -250,6 +274,48 @@ export default function GroupPage({
       setProfileError("Network error");
     } finally {
       setAddingProfile(false);
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    setLeaving(true);
+    setLeaveError("");
+    try {
+      const res = await api(`/api/groups/${id}/leave`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setLeaveError(data.error || "Failed to leave group");
+        setLeaveConfirm(false);
+        return;
+      }
+      window.location.href = "/";
+    } catch {
+      setLeaveError("Network error");
+      setLeaveConfirm(false);
+    } finally {
+      setLeaving(false);
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    setDeleting(true);
+    try {
+      const res = await api(`/api/groups/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (res.ok) {
+        window.location.href = "/";
+      }
+    } catch {
+      // ignore
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -357,8 +423,19 @@ export default function GroupPage({
             damping: 12,
           }}
           whileHover={{ rotate: 0, scale: 1.02 }}
-          className="mt-2 mb-6 cursor-default rounded-2xl border-3 border-black bg-secondary px-6 py-5 shadow-[5px_5px_0px_#000] sm:mt-0 sm:mb-8 sm:border-4 sm:px-12 sm:py-8 sm:shadow-[8px_8px_0px_#000]"
+          className="relative mt-2 mb-6 cursor-default rounded-2xl border-3 border-black bg-secondary px-6 py-5 shadow-[5px_5px_0px_#000] sm:mt-0 sm:mb-8 sm:border-4 sm:px-12 sm:py-8 sm:shadow-[8px_8px_0px_#000]"
         >
+          {isAdmin && (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setEditMode((v) => !v)}
+              title={editMode ? "Exit edit mode" : "Edit group"}
+              className={`absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg border-2 border-black text-base shadow-[2px_2px_0px_#000] transition-colors sm:top-4 sm:right-4 sm:h-10 sm:w-10 sm:text-lg ${editMode ? "bg-red-200" : "bg-white/80"}`}
+            >
+              {editMode ? "✕" : "✏️"}
+            </motion.button>
+          )}
           <h1 className="text-center text-2xl leading-tight font-black uppercase tracking-tight text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] sm:text-5xl lg:text-6xl">
             {group.name}
           </h1>
@@ -369,6 +446,11 @@ export default function GroupPage({
             {group.members.length} member
             {group.members.length !== 1 ? "s" : ""}
           </p>
+          {editMode && (
+            <p className="mt-2 text-center text-[10px] font-bold uppercase text-red-200 sm:text-xs">
+              ✏️ Edit mode — remove buttons visible
+            </p>
+          )}
         </motion.div>
 
         {/* ====== TAB NAVIGATION (sticky) ====== */}
@@ -563,8 +645,8 @@ export default function GroupPage({
                         />
                       </div>
 
-                      {/* Admin delete */}
-                      {isAdmin && (
+                      {/* Admin delete — only visible in edit mode */}
+                      {isAdmin && editMode && (
                         <button
                           onClick={() => handleDeleteProfile(p._id)}
                           className="mt-2.5 rounded-lg border-2 border-black bg-red-100 px-3 py-1 text-[10px] font-bold text-red-600 shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] sm:text-xs"
@@ -590,15 +672,22 @@ export default function GroupPage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              {/* Leaderboard banner */}
+              {/* Leaderboard title */}
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ rotate: -1, scale: 1, opacity: 1 }}
-                transition={{ type: "spring" as const, stiffness: 150 }}
-                className="mb-6 rounded-2xl border-3 border-black bg-primary px-6 py-4 shadow-[5px_5px_0px_#000] sm:border-4 sm:px-10 sm:py-6 sm:shadow-[8px_8px_0px_#000]"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, type: "spring" as const, stiffness: 200 }}
+                className="mb-5 flex flex-col items-center pt-1 sm:mb-8 sm:pt-2"
               >
-                <h2 className="text-center text-xl font-black uppercase sm:text-4xl">
-                  🏆 Most Saluted
+                <motion.span
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, repeatDelay: 2 }}
+                  className="text-4xl sm:text-6xl"
+                >
+                  🏆
+                </motion.span>
+                <h2 className="mt-1 text-center text-3xl font-black uppercase tracking-tight sm:text-5xl">
+                  <span className="text-primary">Leader</span>board
                 </h2>
               </motion.div>
 
@@ -610,20 +699,20 @@ export default function GroupPage({
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2.5 sm:gap-4">
+                <div className="flex flex-col gap-4 sm:gap-6">
                   {leaderboard.map((p, i) => (
                     <motion.div
                       key={p._id}
                       initial={{ opacity: 0, x: -40 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
-                        delay: i * 0.04,
+                        delay: i * 0.03,
                         type: "spring" as const,
                         stiffness: 200,
                         damping: 20,
                       }}
                       whileHover={{ x: 6, scale: 1.01 }}
-                      className={`flex items-center gap-2 rounded-xl border-3 border-black px-2 py-2 shadow-[3px_3px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:gap-4 sm:rounded-2xl sm:border-4 sm:px-5 sm:py-4 sm:shadow-[6px_6px_0px_#000] ${
+                      className={`flex items-center gap-2 rounded-xl border-3 border-black px-4 py-4 shadow-[3px_3px_0px_#000] transition-shadow hover:shadow-[8px_8px_0px_#000] sm:gap-4 sm:rounded-2xl sm:border-4 sm:px-8 sm:py-6 sm:shadow-[6px_6px_0px_#000] ${
                         ROW_COLORS[i % ROW_COLORS.length]
                       }`}
                     >
@@ -653,16 +742,27 @@ export default function GroupPage({
                         </p>
                       </div>
 
-                      {/* Score */}
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="flex shrink-0 items-center gap-0.5 rounded-lg border-2 border-black bg-positive px-2 py-1 font-black shadow-[2px_2px_0px_#000] sm:gap-1 sm:rounded-xl sm:border-3 sm:px-4 sm:py-2 sm:shadow-[3px_3px_0px_#000]"
-                      >
-                        <span className="text-sm sm:text-lg">🫡</span>
-                        <span className="text-xs tabular-nums sm:text-base">
-                          {formatCount(p.respectors)}
-                        </span>
-                      </motion.div>
+                      {/* Score pills */}
+                      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          className="flex items-center gap-0.5 rounded-lg border-2 border-black bg-positive px-2 py-1 font-black shadow-[2px_2px_0px_#000] sm:gap-1 sm:rounded-xl sm:border-3 sm:px-4 sm:py-2 sm:shadow-[3px_3px_0px_#000]"
+                        >
+                          <span className="text-sm sm:text-lg">🫡</span>
+                          <span className="text-xs tabular-nums sm:text-base">
+                            {formatCount(p.respectors)}
+                          </span>
+                        </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          className="flex items-center gap-0.5 rounded-lg border-2 border-black bg-primary px-2 py-1 font-black text-white shadow-[2px_2px_0px_#000] sm:gap-1 sm:rounded-xl sm:border-3 sm:px-4 sm:py-2 sm:shadow-[3px_3px_0px_#000]"
+                        >
+                          <span className="text-sm sm:text-lg">😤</span>
+                          <span className="text-xs tabular-nums sm:text-base">
+                            {formatCount(p.dispiters)}
+                          </span>
+                        </motion.div>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -690,6 +790,8 @@ export default function GroupPage({
                 );
                 // Can this member be promoted? Any admin can promote regular (non-admin) members.
                 const canPromote = isAdmin && !isOwner && !isPromotedAdmin && !isSelf;
+                // Can this admin be demoted? Only the original creator can demote promoted admins.
+                const canDemote = isOriginalAdmin && isPromotedAdmin;
                 return (
                   <motion.div
                     key={m._id}
@@ -724,17 +826,64 @@ export default function GroupPage({
                         ⭐ Make Admin
                       </button>
                     )}
-                    {canRemove && (
-                      <button
+                    {canDemote && editMode && (
+                      <motion.button
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        onClick={() => handleDemoteAdmin(m._id)}
+                        className="rounded-lg border-2 border-black bg-orange-100 px-2.5 py-1 text-[10px] font-bold text-orange-600 shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] sm:text-xs"
+                      >
+                        ↓ Remove Admin
+                      </motion.button>
+                    )}
+                    {canRemove && editMode && (
+                      <motion.button
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
                         onClick={() => handleRemoveMember(m._id)}
                         className="rounded-lg border-2 border-black bg-red-100 px-2.5 py-1 text-[10px] font-bold text-red-600 shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] sm:text-xs"
                       >
                         🚫 Remove
-                      </button>
+                      </motion.button>
                     )}
                   </motion.div>
                 );
               })}
+
+              {/* Danger Zone */}
+              <div className="mt-6 border-t-2 border-dashed border-gray-200 pt-5">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Danger Zone
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => { setLeaveError(""); setLeaveConfirm(true); }}
+                    className="rounded-xl border-3 border-black bg-orange-100 px-4 py-2.5 text-xs font-black uppercase text-orange-700 shadow-[3px_3px_0px_#000] transition-all hover:bg-orange-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-5 sm:text-sm"
+                  >
+                    🚪 Leave Group
+                  </motion.button>
+                  {isOriginalAdmin && editMode && (
+                    <motion.button
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setDeleteConfirm(true)}
+                      className="rounded-xl border-3 border-black bg-red-100 px-4 py-2.5 text-xs font-black uppercase text-red-700 shadow-[3px_3px_0px_#000] transition-all hover:bg-red-200 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none sm:px-5 sm:text-sm"
+                    >
+                      🗑️ Delete Group
+                    </motion.button>
+                  )}
+                </div>
+                {leaveError && (
+                  <p className="mt-3 text-xs font-bold text-red-500 sm:text-sm">{leaveError}</p>
+                )}
+              </div>
             </motion.div>
           )}
 
@@ -868,6 +1017,118 @@ export default function GroupPage({
           )}
         </AnimatePresence>
       </main>
+      {/* ====== LEAVE GROUP CONFIRM MODAL ====== */}
+      <AnimatePresence>
+        {leaveConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4"
+            onClick={() => !leaving && setLeaveConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-2xl border-4 border-black bg-white p-6 shadow-[8px_8px_0px_#000] sm:p-8"
+            >
+              <p className="mb-2 text-4xl text-center sm:text-5xl">🚪</p>
+              <h2 className="mb-2 text-center text-xl font-black uppercase sm:text-2xl">
+                Leave Group?
+              </h2>
+
+              {isOriginalAdmin && group.admins.length === 0 ? (
+                <>
+                  <p className="mb-5 text-center text-sm text-gray-600 sm:text-base">
+                    You're the only admin. <strong>Promote a member to admin</strong> first, or delete the group.
+                  </p>
+                  <button
+                    onClick={() => setLeaveConfirm(false)}
+                    className="w-full rounded-xl border-3 border-black bg-secondary px-5 py-3 text-sm font-black uppercase text-white shadow-[4px_4px_0px_#000] transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                  >
+                    Got it
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="mb-5 text-center text-sm text-gray-600 sm:text-base">
+                    {isOriginalAdmin
+                      ? <>Ownership will transfer to <strong>{group.admins[0]?.username}</strong>. You'll be removed from the group.</>
+                      : <>You'll be removed from <strong>{group.name}</strong>. You'll need an invite code to rejoin.</>
+                    }
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setLeaveConfirm(false)}
+                      disabled={leaving}
+                      className="flex-1 rounded-xl border-3 border-black bg-white px-4 py-3 text-sm font-black uppercase shadow-[3px_3px_0px_#000] transition-all hover:bg-gray-50 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleLeaveGroup}
+                      disabled={leaving}
+                      className="flex-1 rounded-xl border-3 border-black bg-orange-400 px-4 py-3 text-sm font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:bg-orange-500 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                    >
+                      {leaving ? "Leaving..." : "Leave"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ====== DELETE GROUP CONFIRM MODAL ====== */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4"
+            onClick={() => !deleting && setDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-2xl border-4 border-black bg-white p-6 shadow-[8px_8px_0px_#000] sm:p-8"
+            >
+              <p className="mb-2 text-4xl text-center sm:text-5xl">🗑️</p>
+              <h2 className="mb-2 text-center text-xl font-black uppercase sm:text-2xl">
+                Delete Group?
+              </h2>
+              <p className="mb-5 text-center text-sm text-gray-600 sm:text-base">
+                <strong>{group.name}</strong> and all its profiles will be permanently deleted. This cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="flex-1 rounded-xl border-3 border-black bg-white px-4 py-3 text-sm font-black uppercase shadow-[3px_3px_0px_#000] transition-all hover:bg-gray-50 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteGroup}
+                  disabled={deleting}
+                  className="flex-1 rounded-xl border-3 border-black bg-red-500 px-4 py-3 text-sm font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:bg-red-600 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Footer />
     </div>
   );
