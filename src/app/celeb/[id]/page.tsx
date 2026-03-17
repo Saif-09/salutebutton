@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { siteConfig } from "@/constants/site";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -79,10 +80,16 @@ export default async function CelebPage({
     <>
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 pb-12">
-        <div className="mt-10 flex justify-center">
+        <div className="mt-10 flex flex-col items-center">
           <div className="w-full max-w-xs pt-14">
             <CelebPageClient celeb={celeb} />
           </div>
+          <Link
+            href="/"
+            className="neo-brutal mt-10 inline-flex items-center gap-2 bg-primary px-6 py-3 text-sm font-black uppercase tracking-wide transition-transform hover:-translate-y-1 hover:scale-105 sm:text-base"
+          >
+            Explore More
+          </Link>
         </div>
       </main>
       <Footer />
