@@ -12,6 +12,7 @@ interface SaluteButtonProps {
   onSalute: (count: number) => void;
   onPress?: () => void;
   className?: string;
+  size?: "default" | "large";
 }
 
 export function SaluteButton({
@@ -19,7 +20,9 @@ export function SaluteButton({
   onSalute,
   onPress,
   className,
+  size = "default",
 }: SaluteButtonProps) {
+  const lg = size === "large";
   const [count, setCount] = useState(initialCount);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [pressed, setPressed] = useState(false);
@@ -86,7 +89,9 @@ export function SaluteButton({
         whileTap={{ scale: 0.95, y: 2 }}
         onClick={handleClick}
         className={cn(
-          "relative flex max-w-full select-none items-center gap-1.5 overflow-hidden rounded-xl border-3 border-black bg-positive px-3 py-1 font-black transition-all sm:gap-2 sm:px-5 sm:py-2",
+          lg
+            ? "relative flex max-w-full select-none items-center gap-2.5 overflow-hidden rounded-xl border-3 border-black bg-positive px-6 py-3 font-black transition-all"
+            : "relative flex max-w-full select-none items-center gap-1.5 overflow-hidden rounded-xl border-3 border-black bg-positive px-3 py-1 font-black transition-all sm:gap-2 sm:px-5 sm:py-2",
           pressed
             ? "translate-y-[3px] shadow-[1px_1px_0px_#000]"
             : "shadow-[4px_4px_0px_#000] hover:shadow-[5px_5px_0px_#000]",
@@ -96,7 +101,7 @@ export function SaluteButton({
         <motion.span
           animate={pressed ? { scale: [1, 1.4, 1], rotate: [0, 15, 0] } : {}}
           transition={{ duration: 0.3 }}
-          className="inline-block text-base sm:text-xl"
+          className={lg ? "inline-block text-2xl" : "inline-block text-base sm:text-xl"}
         >
           🫡
         </motion.span>
@@ -105,7 +110,7 @@ export function SaluteButton({
           initial={{ scale: 1.4, y: -3 }}
           animate={{ scale: 1, y: 0 }}
           transition={{ type: "spring" as const, stiffness: 400, damping: 15 }}
-          className="text-sm tabular-nums sm:text-base"
+          className={lg ? "text-lg tabular-nums" : "text-sm tabular-nums sm:text-base"}
         >
           {formatCount(count)}
         </motion.span>

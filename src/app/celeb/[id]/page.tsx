@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { siteConfig } from "@/constants/site";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { CelebPageClient } from "./client";
+import { ExploreButton } from "./explore-button";
 import type { Celeb } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5001";
@@ -79,18 +79,14 @@ export default async function CelebPage({
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 pb-12">
+      <main className="mx-auto max-w-6xl px-10 pb-12">
         <div className="mt-10 flex flex-col items-center">
-          <div className="w-full max-w-xs pt-14">
-            <CelebPageClient celeb={celeb} />
+          <div className="w-full max-w-sm pt-20 sm:max-w-md">
+            <CelebPageClient celeb={celeb} size="large" />
           </div>
-          <Link
-            href="/"
-            className="neo-brutal mt-10 inline-flex items-center gap-2 px-8 py-3 text-sm font-black uppercase tracking-wide text-white transition-transform hover:-translate-y-1 hover:scale-105 sm:text-base"
-            style={{ backgroundColor: "#FF7F3E" }}
-          >
-            Explore More 🫡
-          </Link>
+          <div className="mt-10">
+            <ExploreButton />
+          </div>
         </div>
       </main>
       <Footer />

@@ -55,6 +55,7 @@ export default function GroupPage({
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("profiles");
   const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Add profile state
   const [profileName, setProfileName] = useState("");
@@ -223,6 +224,22 @@ export default function GroupPage({
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const shareGroupLink = () => {
+    if (!group) return;
+    const url = `${window.location.origin}/join/${group.code}`;
+    if (navigator.share) {
+      navigator.share({
+        title: `Join ${group.name} on SaluteButton`,
+        text: `Vote on SaluteButton! Join my group "${group.name}"`,
+        url,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 1500);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -272,6 +289,13 @@ export default function GroupPage({
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-1.5 sm:gap-2"
           >
+            <button
+              onClick={shareGroupLink}
+              className="rounded-xl border-3 border-black px-3 py-2 text-xs font-black text-white shadow-[3px_3px_0px_#000] transition-all active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-4 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"
+              style={{ backgroundColor: "#D6293E" }}
+            >
+              {copiedLink ? "Copied! ✅" : "🔗 Invite"}
+            </button>
             <button
               onClick={copyCode}
               className="rounded-xl border-3 border-black bg-primary-light px-3 py-2 text-xs font-black shadow-[3px_3px_0px_#000] transition-all active:translate-y-[2px] active:shadow-[1px_1px_0px_#000] sm:px-4 sm:py-2.5 sm:text-sm sm:shadow-[4px_4px_0px_#000]"

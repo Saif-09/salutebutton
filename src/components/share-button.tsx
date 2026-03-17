@@ -10,9 +10,11 @@ interface ShareButtonProps {
   respectors: number;
   className?: string;
   onToggle?: (open: boolean) => void;
+  size?: "default" | "large";
 }
 
-export function ShareButton({ celebId, celebName, respectors, className = "", onToggle }: ShareButtonProps) {
+export function ShareButton({ celebId, celebName, respectors, className = "", onToggle, size = "default" }: ShareButtonProps) {
+  const lg = size === "large";
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
@@ -82,14 +84,16 @@ export function ShareButton({ celebId, celebName, respectors, className = "", on
             return next;
           });
         }}
-        className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-black bg-green-100 text-xs shadow-[1px_1px_0px_#000] transition-colors hover:bg-green-200 sm:h-7 sm:w-7 sm:text-sm"
+        className={lg
+          ? "flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-green-100 text-base shadow-[2px_2px_0px_#000] transition-colors hover:bg-green-200"
+          : "flex h-6 w-6 items-center justify-center rounded-full border-2 border-black bg-green-100 text-xs shadow-[1px_1px_0px_#000] transition-colors hover:bg-green-200 sm:h-7 sm:w-7 sm:text-sm"}
         aria-label={`Share ${celebName}`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
-          className="h-3 w-3 sm:h-3.5 sm:w-3.5"
+          className={lg ? "h-5 w-5" : "h-3 w-3 sm:h-3.5 sm:w-3.5"}
         >
           <path d="M13 4.5a2.5 2.5 0 11.702 1.737L6.97 9.604a2.518 2.518 0 010 .799l6.733 3.364a2.5 2.5 0 11-.671 1.341l-6.733-3.364a2.5 2.5 0 110-3.482l6.733-3.364A2.52 2.52 0 0113 4.5z" />
         </svg>
