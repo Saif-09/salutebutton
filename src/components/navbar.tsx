@@ -149,7 +149,7 @@ export function Navbar() {
 
               {/* Drawer items */}
               <div className="flex flex-col gap-3 p-5">
-                {hasGroups && (
+                {isAuthenticated && hasGroups && (
                   <button
                     onClick={() => {
                       setDrawerOpen(false);
@@ -175,7 +175,7 @@ export function Navbar() {
                   Groups
                 </button>
 
-                {!hasGroups && (
+                {isAuthenticated && !hasGroups && (
                   <button
                     onClick={() => {
                       setDrawerOpen(false);

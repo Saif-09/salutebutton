@@ -288,11 +288,11 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                   <div className="my-4 border-t-3 border-black" />
 
                   <div className="flex flex-col gap-3">
-                    {hasGroups && (
+                    {isAuthenticated && hasGroups && (
                       <button
                         onClick={() => {
                           setView("my-groups");
-                          if (isAuthenticated) fetchMyGroups();
+                          fetchMyGroups();
                         }}
                         className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                       >
@@ -320,11 +320,11 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                     >
                       🌍 Public Groups
                     </button>
-                    {!hasGroups && (
+                    {isAuthenticated && !hasGroups && (
                       <button
                         onClick={() => {
                           setView("my-groups");
-                          if (isAuthenticated) fetchMyGroups();
+                          fetchMyGroups();
                         }}
                         className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
                       >
