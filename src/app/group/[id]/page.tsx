@@ -444,7 +444,8 @@ export default function GroupPage({
             {group.profiles.length} profile
             {group.profiles.length !== 1 ? "s" : ""} &middot;{" "}
             {group.members.length} member
-            {group.members.length !== 1 ? "s" : ""}
+            {group.members.length !== 1 ? "s" : ""} &middot;{" "}
+            {group.isPublic ? "🌍 Public" : "🔒 Private"}
           </p>
           {editMode && (
             <p className="mt-2 text-center text-[10px] font-bold uppercase text-red-200 sm:text-xs">

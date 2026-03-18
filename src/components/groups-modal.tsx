@@ -15,7 +15,17 @@ interface GroupsModalProps {
   initialCode?: string;
 }
 
-type View = "menu" | "create" | "join" | "my-groups";
+type View = "menu" | "create" | "join" | "my-groups" | "public-groups";
+
+type PublicGroup = {
+  _id: string;
+  name: string;
+  code: string;
+  isPublic: boolean;
+  memberCount: number;
+  profileCount: number;
+  createdBy: string;
+};
 
 export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCode }: GroupsModalProps) {
   const router = useRouter();
@@ -24,9 +34,16 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
 
   // Create group state
   const [groupName, setGroupName] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createdGroup, setCreatedGroup] = useState<Group | null>(null);
   const [createError, setCreateError] = useState("");
+
+  // Public groups state
+  const [publicGroups, setPublicGroups] = useState<PublicGroup[]>([]);
+  const [loadingPublic, setLoadingPublic] = useState(false);
+  const [joiningPublicId, setJoiningPublicId] = useState<string | null>(null);
+  const [publicJoinError, setPublicJoinError] = useState("");
 
   // Join group state
   const [joinCode, setJoinCode] = useState("");
@@ -50,6 +67,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
       setTimeout(() => {
         setView("menu");
         setGroupName("");
+        setIsPublic(false);
         setCreating(false);
         setCreatedGroup(null);
         setCreateError("");
@@ -58,6 +76,8 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
         setJoinError("");
         setJoinedGroup(null);
         setCopied(false);
+        setPublicGroups([]);
+        setPublicJoinError("");
       }, 200);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,7 +91,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
       const res = await api("/api/groups/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: groupName.trim() }),
+        body: JSON.stringify({ name: groupName.trim(), isPublic }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -119,6 +139,46 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
       // ignore
     } finally {
       setLoadingGroups(false);
+    }
+  };
+
+  const fetchPublicGroups = async () => {
+    setLoadingPublic(true);
+    try {
+      const res = await api("/api/groups/public");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) setPublicGroups(data);
+    } catch {
+      // ignore
+    } finally {
+      setLoadingPublic(false);
+    }
+  };
+
+  const handleJoinPublic = async (groupId: string) => {
+    setJoiningPublicId(groupId);
+    setPublicJoinError("");
+    try {
+      const res = await api(`/api/groups/join/${groupId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.error?.includes("already")) {
+          onClose();
+          router.push(`/group/${groupId}`);
+          return;
+        }
+        setPublicJoinError(data.error || "Failed to join group");
+        return;
+      }
+      onClose();
+      router.push(`/group/${data._id}`);
+    } catch {
+      setPublicJoinError("Network error");
+    } finally {
+      setJoiningPublicId(null);
     }
   };
 
@@ -234,6 +294,15 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                     </button>
                     <button
                       onClick={() => {
+                        setView("public-groups");
+                        fetchPublicGroups();
+                      }}
+                      className="w-full rounded-xl border-3 border-black bg-accent-light px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                    >
+                      🌍 Public Groups
+                    </button>
+                    <button
+                      onClick={() => {
                         setView("my-groups");
                         if (isAuthenticated) fetchMyGroups();
                       }}
@@ -304,6 +373,32 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                           className="w-full rounded-xl border-3 border-black bg-primary-light px-4 py-3 text-base font-semibold outline-none shadow-[3px_3px_0px_#000] transition-shadow focus:shadow-[5px_5px_0px_#000]"
                           maxLength={30}
                         />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-black uppercase">
+                          GROUP TYPE
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsPublic(false)}
+                            className={`flex-1 rounded-xl border-3 border-black px-3 py-2.5 text-sm font-black uppercase shadow-[3px_3px_0px_#000] transition-all ${!isPublic ? "bg-secondary text-white" : "bg-white text-black hover:bg-gray-50"}`}
+                          >
+                            🔒 Private
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsPublic(true)}
+                            className={`flex-1 rounded-xl border-3 border-black px-3 py-2.5 text-sm font-black uppercase shadow-[3px_3px_0px_#000] transition-all ${isPublic ? "bg-positive text-black" : "bg-white text-black hover:bg-gray-50"}`}
+                          >
+                            🌍 Public
+                          </button>
+                        </div>
+                        <p className="mt-1.5 text-xs font-semibold text-gray-400">
+                          {isPublic
+                            ? "Anyone can find and join this group"
+                            : "Only people with the code or invite can join"}
+                        </p>
                       </div>
                       {createError && (
                         <p className="text-sm font-bold text-red-500">
@@ -454,6 +549,95 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                           </span>
                         </motion.button>
                       ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* ====== PUBLIC GROUPS ====== */}
+              {view === "public-groups" && (
+                <motion.div
+                  key="public-groups"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                >
+                  {renderHeader("Public Groups", () => setView("menu"))}
+
+                  {loadingPublic ? (
+                    <div className="py-8 text-center">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 0.8,
+                          ease: "linear",
+                        }}
+                        className="mx-auto h-10 w-10 rounded-full border-4 border-black border-t-transparent"
+                      />
+                      <p className="mt-3 text-sm font-bold text-gray-500">
+                        Loading...
+                      </p>
+                    </div>
+                  ) : publicGroups.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <p className="text-5xl">🌍</p>
+                      <p className="mt-3 text-base font-black uppercase text-gray-400">
+                        No public groups yet
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-gray-400">
+                        Be the first to create one!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2.5">
+                      {publicJoinError && (
+                        <p className="text-sm font-bold text-red-500">
+                          {publicJoinError}
+                        </p>
+                      )}
+                      <div className="flex max-h-64 flex-col gap-2.5 overflow-y-auto pr-1">
+                        {publicGroups.map((g, i) => (
+                          <motion.div
+                            key={g._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="flex items-center justify-between rounded-xl border-3 border-black bg-white px-4 py-3 shadow-[3px_3px_0px_#000]"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-black uppercase truncate">
+                                {g.name}
+                              </p>
+                              <p className="text-xs font-semibold text-gray-400">
+                                {g.memberCount} member
+                                {g.memberCount !== 1 ? "s" : ""} &middot;{" "}
+                                {g.profileCount} profile
+                                {g.profileCount !== 1 ? "s" : ""}
+                              </p>
+                              <p className="text-[10px] font-semibold text-gray-300">
+                                by {g.createdBy}
+                              </p>
+                            </div>
+                            {isAuthenticated ? (
+                              <button
+                                onClick={() => handleJoinPublic(g._id)}
+                                disabled={joiningPublicId === g._id}
+                                className="ml-2 shrink-0 rounded-lg border-2 border-black bg-positive px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000] disabled:opacity-50"
+                              >
+                                {joiningPublicId === g._id ? "..." : "Join"}
+                              </button>
+                            ) : (
+                              <button
+                                onClick={handleLoginClick}
+                                className="ml-2 shrink-0 rounded-lg border-2 border-black bg-secondary-light px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_#000] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0px_0px_0px_#000]"
+                              >
+                                Login
+                              </button>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </motion.div>

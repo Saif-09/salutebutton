@@ -16,6 +16,7 @@ type GroupPreviewData = {
   _id: string;
   name: string;
   code: string;
+  isPublic?: boolean;
   memberCount: number;
   profileCount: number;
   createdBy: string;

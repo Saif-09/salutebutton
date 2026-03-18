@@ -55,6 +55,7 @@ export type Group = {
   _id: string;
   name: string;
   code: string;
+  isPublic: boolean;
   createdBy: { _id: string; username: string };
   admins: { _id: string; username: string }[];
   members: { _id: string; username: string }[];

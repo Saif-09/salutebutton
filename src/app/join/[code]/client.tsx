@@ -25,6 +25,7 @@ type GroupPreviewData = {
   _id: string;
   name: string;
   code: string;
+  isPublic?: boolean;
   memberCount: number;
   profileCount: number;
   createdBy: string;
@@ -287,8 +288,11 @@ export function JoinGroupPageClient({ code, profileId, initialPreview }: JoinGro
             </div>
           </div>
 
-          <p className="mb-6 text-xs text-gray-400">
+          <p className="mb-3 text-xs text-gray-400">
             Created by <span className="font-black text-black">{preview.createdBy}</span>
+          </p>
+          <p className="mb-6 text-xs font-bold uppercase text-gray-400">
+            {preview.isPublic ? "🌍 Public Group" : "🔒 Private Group"}
           </p>
 
           <div className="border-t-2 border-dashed border-gray-200 pt-6">
