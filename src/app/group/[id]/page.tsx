@@ -226,30 +226,27 @@ export default function GroupPage({
     setUploading(true);
     setProfileError("");
     try {
-      let processedFile: File | Blob = file;
-
-      // Compress large images (> 2MB) using canvas — resizes and converts to JPEG
-      if (processedFile.size > 2 * 1024 * 1024) {
-        const bitmap = await createImageBitmap(processedFile);
-        const maxDim = 1200;
-        let { width, height } = bitmap;
-        if (width > maxDim || height > maxDim) {
-          const scale = maxDim / Math.max(width, height);
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-        }
-        const canvas = new OffscreenCanvas(width, height);
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(bitmap, 0, 0, width, height);
-        bitmap.close();
-        processedFile = await canvas.convertToBlob({
-          type: "image/jpeg",
-          quality: 0.8,
-        });
+      // Always convert through canvas to guarantee JPEG output
+      // This handles HEIC, HEIF, and any other format the browser can decode
+      const bitmap = await createImageBitmap(file);
+      const maxDim = 1200;
+      let { width, height } = bitmap;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
       }
+      const canvas = new OffscreenCanvas(width, height);
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      bitmap.close();
+      const blob = await canvas.convertToBlob({
+        type: "image/jpeg",
+        quality: 0.8,
+      });
 
       const formData = new FormData();
-      formData.append("image", processedFile, file.name);
+      formData.append("image", blob, "photo.jpg");
       const res = await api("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) {
@@ -975,7 +972,7 @@ export default function GroupPage({
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      accept="image/*"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
