@@ -76,8 +76,21 @@ export default async function CelebPage({
   const celeb = await getCeleb(id);
   if (!celeb) notFound();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: celeb.name,
+    image: celeb.image,
+    url: `${siteConfig.url}/celeb/${id}`,
+    description: celeb.comment || `${celeb.name} on SaluteButton`,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <main className="mx-auto max-w-6xl px-10 pb-12">
         <div className="mt-10 flex flex-col items-center">
