@@ -7,6 +7,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { hydrateAuth } from "@/store/slices/auth-slice";
+import { fetchProfile } from "@/store/slices/profile-slice";
 import { api } from "@/lib/api";
 import { LoginModal } from "@/components/login-modal";
 import { SaluteButton } from "@/components/salute-button";
@@ -131,6 +132,7 @@ export function JoinGroupPageClient({ code, profileId, initialPreview }: JoinGro
         setError(data.error || "Failed to join group");
         return;
       }
+      dispatch(fetchProfile());
       router.push(`/group/${data._id}`);
     } catch {
       setError("Network error, please try again");

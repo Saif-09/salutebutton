@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { hydrateAuth } from "@/store/slices/auth-slice";
+import { fetchProfile } from "@/store/slices/profile-slice";
 import { api } from "@/lib/api";
 import { SaluteButton } from "@/components/salute-button";
 import { DisrespectButton } from "@/components/disrespect-button";
@@ -292,6 +293,7 @@ export default function GroupPage({
         setLeaveConfirm(false);
         return;
       }
+      dispatch(fetchProfile());
       window.location.href = "/";
     } catch {
       setLeaveError("Network error");
@@ -310,6 +312,7 @@ export default function GroupPage({
         body: JSON.stringify({}),
       });
       if (res.ok) {
+        dispatch(fetchProfile());
         window.location.href = "/";
       }
     } catch {

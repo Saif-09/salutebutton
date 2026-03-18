@@ -27,6 +27,7 @@ export function Navbar() {
   const [groupsInitialCode, setGroupsInitialCode] = useState<string | undefined>(undefined);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated, username } = useAppSelector((s) => s.auth);
+  const hasGroups = useAppSelector((s) => s.profile.groups.hasGroups);
   const pendingJoinCodeRef = useRef<string | null>(null);
 
   // Handle ?join=CODE URL param — auto-open login or groups modal
@@ -148,6 +149,20 @@ export function Navbar() {
 
               {/* Drawer items */}
               <div className="flex flex-col gap-3 p-5">
+                {hasGroups && (
+                  <button
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      setGroupsInitialView("my-groups");
+                      setGroupsOpen(true);
+                    }}
+                    className="flex items-center gap-3 rounded-xl border-3 border-black bg-positive px-4 py-3 text-left text-sm font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000]"
+                  >
+                    <span className="text-lg">🔍</span>
+                    My Groups
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     setDrawerOpen(false);
@@ -160,17 +175,19 @@ export function Navbar() {
                   Groups
                 </button>
 
-                <button
-                  onClick={() => {
-                    setDrawerOpen(false);
-                    setGroupsInitialView("my-groups");
-                    setGroupsOpen(true);
-                  }}
-                  className="flex items-center gap-3 rounded-xl border-3 border-black bg-positive px-4 py-3 text-left text-sm font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000]"
-                >
-                  <span className="text-lg">🔍</span>
-                  My Groups
-                </button>
+                {!hasGroups && (
+                  <button
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      setGroupsInitialView("my-groups");
+                      setGroupsOpen(true);
+                    }}
+                    className="flex items-center gap-3 rounded-xl border-3 border-black bg-positive px-4 py-3 text-left text-sm font-black uppercase text-white shadow-[3px_3px_0px_#000] transition-all hover:translate-y-[-1px] hover:shadow-[5px_5px_0px_#000] active:translate-y-[1px] active:shadow-[1px_1px_0px_#000]"
+                  >
+                    <span className="text-lg">🔍</span>
+                    My Groups
+                  </button>
+                )}
 
                 <button
                   onClick={() => {

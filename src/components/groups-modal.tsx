@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { fetchProfile } from "@/store/slices/profile-slice";
 import { api } from "@/lib/api";
 import type { Group } from "@/types";
 
@@ -29,6 +30,7 @@ type PublicGroup = {
 
 export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCode }: GroupsModalProps) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [view, setView] = useState<View>("menu");
   const { isAuthenticated, userId } = useAppSelector((s) => s.auth);
 
@@ -54,14 +56,17 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
   // My groups state
   const [myGroups, setMyGroups] = useState<Group[]>([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  const hasGroups = useAppSelector((s) => s.profile.groups.hasGroups);
 
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (open && initialView) {
-      setView(initialView);
-      if (initialView === "my-groups" && isAuthenticated) fetchMyGroups();
-      if (initialView === "join" && initialCode) setJoinCode(initialCode);
+    if (open) {
+      if (initialView) {
+        setView(initialView);
+        if (initialView === "my-groups" && isAuthenticated) fetchMyGroups();
+        if (initialView === "join" && initialCode) setJoinCode(initialCode);
+      }
     }
     if (!open) {
       setTimeout(() => {
@@ -99,6 +104,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
         return;
       }
       setCreatedGroup(data);
+      dispatch(fetchProfile());
     } catch {
       setCreateError("Network error");
     } finally {
@@ -122,6 +128,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
         return;
       }
       setJoinedGroup(data);
+      dispatch(fetchProfile());
     } catch {
       setJoinError("Network error");
     } finally {
@@ -173,6 +180,7 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
         setPublicJoinError(data.error || "Failed to join group");
         return;
       }
+      dispatch(fetchProfile());
       onClose();
       router.push(`/group/${data._id}`);
     } catch {
@@ -280,6 +288,17 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                   <div className="my-4 border-t-3 border-black" />
 
                   <div className="flex flex-col gap-3">
+                    {hasGroups && (
+                      <button
+                        onClick={() => {
+                          setView("my-groups");
+                          if (isAuthenticated) fetchMyGroups();
+                        }}
+                        className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                      >
+                        🔍 My Groups
+                      </button>
+                    )}
                     <button
                       onClick={() => setView("create")}
                       className="w-full rounded-xl border-3 border-black bg-primary-light px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
@@ -301,15 +320,17 @@ export function GroupsModal({ open, onClose, onOpenLogin, initialView, initialCo
                     >
                       🌍 Public Groups
                     </button>
-                    <button
-                      onClick={() => {
-                        setView("my-groups");
-                        if (isAuthenticated) fetchMyGroups();
-                      }}
-                      className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
-                    >
-                      🔍 My Groups
-                    </button>
+                    {!hasGroups && (
+                      <button
+                        onClick={() => {
+                          setView("my-groups");
+                          if (isAuthenticated) fetchMyGroups();
+                        }}
+                        className="w-full rounded-xl border-3 border-black bg-positive px-5 py-4 text-lg font-black uppercase shadow-[4px_4px_0px_#000] transition-all hover:shadow-[6px_6px_0px_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#000]"
+                      >
+                        🔍 My Groups
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}

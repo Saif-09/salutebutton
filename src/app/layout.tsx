@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/constants/site";
 import { ReduxProvider } from "@/store/provider";
 import { ConnectionStatus } from "@/components/connection-status";
+import { SessionExpiredModal } from "@/components/session-expired-modal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -72,6 +73,7 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <ConnectionStatus>{children}</ConnectionStatus>
+          <SessionExpiredModal />
         </ReduxProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setAuth, logout } from "@/store/slices/auth-slice";
+import { fetchProfile, clearProfile } from "@/store/slices/profile-slice";
 import { api } from "@/lib/api";
 
 interface LoginModalProps {
@@ -132,6 +133,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
           username: data.username,
         }),
       );
+      dispatch(fetchProfile());
 
       setSecretCode(data.secretCode);
     } catch {
@@ -182,6 +184,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
           username: data.username,
         }),
       );
+      dispatch(fetchProfile());
 
       setLoginSuccess(true);
     } catch {
@@ -196,6 +199,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
     dispatch(logout());
+    dispatch(clearProfile());
     resetForm();
     onClose();
   };
