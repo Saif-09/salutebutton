@@ -91,17 +91,17 @@ export function SaluteButton({
         className={cn(
           lg
             ? "relative flex max-w-full select-none items-center justify-center gap-2.5 overflow-hidden rounded-xl border-3 border-black bg-positive px-6 py-3 font-black text-white transition-all"
-            : "relative flex max-w-full select-none items-center justify-center gap-1.5 overflow-hidden rounded-xl border-3 border-black bg-positive px-3 py-1 font-black text-white transition-all sm:gap-2 sm:px-5 sm:py-2",
+            : "relative flex max-w-full select-none items-center justify-center gap-1 overflow-hidden rounded-lg border-2 border-black bg-positive px-2 py-1 font-black text-white transition-all sm:gap-2 sm:rounded-xl sm:border-3 sm:px-5 sm:py-2",
           pressed
-            ? "translate-y-[3px] shadow-[1px_1px_0px_#000]"
-            : "shadow-[4px_4px_0px_#000] hover:shadow-[5px_5px_0px_#000]",
+            ? "translate-y-[2px] shadow-[1px_1px_0px_#000] sm:translate-y-[3px]"
+            : "shadow-[2px_2px_0px_#000] hover:shadow-[3px_3px_0px_#000] sm:shadow-[4px_4px_0px_#000] sm:hover:shadow-[5px_5px_0px_#000]",
         )}
         aria-label="Salute"
       >
         <motion.span
           animate={pressed ? { scale: [1, 1.4, 1], rotate: [0, 15, 0] } : {}}
           transition={{ duration: 0.3 }}
-          className={lg ? "inline-block text-2xl" : "inline-block text-base sm:text-xl"}
+          className={lg ? "inline-block text-2xl" : "inline-block text-sm sm:text-xl"}
         >
           🫡
         </motion.span>
