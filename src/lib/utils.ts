@@ -11,16 +11,16 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatCount(n: number): string {
   if (n >= 1_000_000_000) {
-    const val = n / 1_000_000_000;
-    return val >= 10 ? `${Math.round(val)}B` : `${val.toFixed(1).replace(/\.0$/, "")}B`;
+    const val = Math.floor(n / 1_000_000) / 1_000; // truncate to 2 decimal places
+    return `${val.toFixed(2).replace(/\.?0+$/, "")}B`;
   }
   if (n >= 1_000_000) {
-    const val = n / 1_000_000;
-    return val >= 10 ? `${Math.round(val)}M` : `${val.toFixed(1).replace(/\.0$/, "")}M`;
+    const val = Math.floor(n / 1_000) / 1_000; // truncate to 2 decimal places
+    return `${val.toFixed(2).replace(/\.?0+$/, "")}M`;
   }
   if (n >= 1_000) {
-    const val = n / 1_000;
-    return val >= 10 ? `${Math.round(val)}K` : `${val.toFixed(1).replace(/\.0$/, "")}K`;
+    const val = Math.floor(n) / 1_000; // truncate to 2 decimal places
+    return `${val.toFixed(2).replace(/\.?0+$/, "")}K`;
   }
   return n.toString();
 }

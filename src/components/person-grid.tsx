@@ -43,6 +43,15 @@ export function PersonGrid() {
       .catch(() => {});
   }, []);
 
+  // Broadcast selected category so TrendingChart can filter
+  useEffect(() => {
+    if (selectedCategory) {
+      window.dispatchEvent(
+        new CustomEvent("category-change", { detail: { categoryId: selectedCategory } }),
+      );
+    }
+  }, [selectedCategory]);
+
   useEffect(() => {
     const timeout = setTimeout(fetchCelebs, 300);
     return () => clearTimeout(timeout);

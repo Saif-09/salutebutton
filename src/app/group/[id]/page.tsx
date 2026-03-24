@@ -12,6 +12,7 @@ import { SaluteButton } from "@/components/salute-button";
 import { DisrespectButton } from "@/components/disrespect-button";
 import { ShareButton } from "@/components/share-button";
 import { Footer } from "@/components/footer";
+import { formatCount } from "@/lib/utils";
 import type { Group, GroupProfile } from "@/types";
 
 const TILTS = [-2, 1.5, 2, -1.5, -1, 2.5, 1, -2.5];
@@ -28,11 +29,6 @@ const ROW_COLORS = [
 
 type Tab = "profiles" | "leaderboard" | "members" | "add-profile";
 
-function formatCount(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return n.toString();
-}
 
 export default function GroupPage({
   params,

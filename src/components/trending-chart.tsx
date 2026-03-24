@@ -7,23 +7,19 @@ import { api } from "@/lib/api";
 import { getSocket } from "@/lib/socket";
 import type { Celeb } from "@/types";
 import { SALUTE_BAR_COLORS, HATE_BAR_COLORS } from "@/lib/theme";
+import { formatCount } from "@/lib/utils";
 
 const RANK_EMOJIS_SALUTE = ["🥇", "🥈", "🥉", "4", "5"];
 const RANK_EMOJIS_HATE = ["💀", "☠️", "👹", "4", "5"];
 
 type Tab = "salute" | "hate";
 
-function formatCount(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return n.toString();
-}
-
 export function TrendingChart() {
   const [allCelebs, setAllCelebs] = useState<Celeb[]>([]);
   const [loading, setLoading] = useState(true);
   const [flashId, setFlashId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("salute");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     api("/api/celebs")
@@ -57,6 +53,16 @@ export function TrendingChart() {
     );
     setFlashId(celebId);
     setTimeout(() => setFlashId(null), 600);
+  }, []);
+
+  // Listen for category changes from PersonGrid
+  useEffect(() => {
+    const handleCategoryChange = (e: Event) => {
+      const { categoryId } = (e as CustomEvent).detail as { categoryId: string };
+      setSelectedCategory(categoryId);
+    };
+    window.addEventListener("category-change", handleCategoryChange);
+    return () => window.removeEventListener("category-change", handleCategoryChange);
   }, []);
 
   // Local custom events (optimistic, same-tab)
@@ -111,10 +117,16 @@ export function TrendingChart() {
 
   if (allCelebs.length === 0) return null;
 
-  const topSaluted = [...allCelebs]
+  const filtered = selectedCategory
+    ? allCelebs.filter((c) => c.category?._id === selectedCategory)
+    : allCelebs;
+
+  if (filtered.length === 0) return null;
+
+  const topSaluted = [...filtered]
     .sort((a, b) => b.respectors - a.respectors)
     .slice(0, 5);
-  const topHated = [...allCelebs]
+  const topHated = [...filtered]
     .sort((a, b) => b.dispiters - a.dispiters)
     .slice(0, 5);
 
@@ -386,7 +398,7 @@ export function TrendingChart() {
                         stiffness: 300,
                         damping: 15,
                       }}
-                      className="w-11 text-right text-[10px] font-black tabular-nums sm:w-16 sm:text-sm"
+                      className="w-14 text-right text-[10px] font-black tabular-nums sm:w-20 sm:text-sm"
                     >
                       {formatCount(value)}
                     </motion.span>
