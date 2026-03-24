@@ -26,6 +26,26 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "akm-img-a-in.tosshub.com",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "documents.bcci.tv",
+      },
+      {
+        protocol: "https",
+        hostname: "bcciplayerimages-v2.s3.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "documents.iplt20.com",
+      },
     ],
   },
 };
